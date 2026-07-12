@@ -54,7 +54,7 @@ void PlaylistTracksViewController::onTrackCellSelected(int index) {
     if (auto fc = getFC()) fc->showBeatSaverResults(s.title, s.artist);
 }
 void PlaylistTracksViewController::onBackClicked() {
-    if (auto fc = getFC()) fc->popToAppleMusicHome();
+    if (auto fc = getFC()) fc->popToLibrary();
 }
 
 bool    PlaylistTracksViewController::get_isLoading()            { return _isLoading; }

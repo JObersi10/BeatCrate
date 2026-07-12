@@ -8,23 +8,25 @@ Configuration& getConfig() {
     return config;
 }
 
-std::string getServerAddress() {
+static std::string cfgGet(const char* key, const char* def = "") {
     auto& cfg = getConfig().config;
-    if (cfg.HasMember("serverAddress") && cfg["serverAddress"].IsString())
-        return cfg["serverAddress"].GetString();
-    return "192.168.1.100:8080";
+    if (cfg.HasMember(key) && cfg[key].IsString()) return cfg[key].GetString();
+    return def;
+}
+static void cfgSet(const char* key, const std::string& val) {
+    auto& cfg = getConfig().config;
+    auto& alloc = cfg.GetAllocator();
+    rapidjson::Value k(key, alloc), v(val.c_str(), alloc);
+    if (!cfg.HasMember(key)) cfg.AddMember(k, v, alloc);
+    else                     cfg[key].SetString(val.c_str(), alloc);
+    getConfig().Write();
 }
 
-void setServerAddress(const std::string& address) {
-    auto& cfg = getConfig().config;
-    if (!cfg.HasMember("serverAddress"))
-        cfg.AddMember("serverAddress",
-                      rapidjson::Value(address.c_str(), cfg.GetAllocator()),
-                      cfg.GetAllocator());
-    else
-        cfg["serverAddress"].SetString(address.c_str(), cfg.GetAllocator());
-    getConfig().Write();
-    AMS_LOG("Server address saved: {}", address);
-}
+std::string getMut()                     { return cfgGet("mut"); }
+void        setMut(const std::string& v) { cfgSet("mut", v); }
+std::string getCachedJwt()               { return cfgGet("jwt"); }
+void        setCachedJwt(const std::string& v) { cfgSet("jwt", v); }
+std::string getStorefront()              { return cfgGet("storefront", "us"); }
+void        setStorefront(const std::string& v){ cfgSet("storefront", v); }
 
 }

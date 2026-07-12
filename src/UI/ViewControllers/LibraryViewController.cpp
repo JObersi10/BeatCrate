@@ -1,6 +1,7 @@
 #include "UI/ViewControllers/LibraryViewController.hpp"
 #include "UI/FlowCoordinators/AppleMusicFlowCoordinator.hpp"
 #include "AppleMusic/AppleMusicClient.hpp"
+#include "Configuration.hpp"
 #include "Log.hpp"
 #include "assets.hpp"
 
@@ -20,22 +21,27 @@ void LibraryViewController::DidActivate(bool firstActivation, bool, bool) {
 }
 
 void LibraryViewController::refresh() {
+    if (getMut().empty()) {
+        set_isLoading(false);
+        set_statusText("No MUT set — open Mod Settings → BeatCrate to paste your token");
+        return;
+    }
     set_isLoading(true);
-    set_statusText("Loading library…");
+    set_statusText("Loading…");
     auto& client = AppleMusicClient::instance();
 
     client.fetchLibrarySongs([this](std::vector<AMSong> songs, std::string err) {
-        if (!err.empty()) { AMS_ERROR("Songs: {}", err); return; }
+        if (!err.empty()) { set_isLoading(false); set_statusText("Error: " + err); return; }
         _songs = std::move(songs);
         if (_activeTab == 0) refreshSongList();
     });
     client.fetchLibraryAlbums([this](std::vector<AMAlbum> albums, std::string err) {
-        if (!err.empty()) { AMS_ERROR("Albums: {}", err); return; }
+        if (!err.empty()) return;
         _albums = std::move(albums);
         if (_activeTab == 1) refreshAlbumList();
     });
     client.fetchLibraryPlaylists([this](std::vector<AMPlaylist> playlists, std::string err) {
-        if (!err.empty()) { AMS_ERROR("Playlists: {}", err); return; }
+        if (!err.empty()) return;
         _playlists = std::move(playlists);
         if (_activeTab == 2) refreshPlaylistList();
         set_isLoading(false);
@@ -51,7 +57,8 @@ void LibraryViewController::refreshSongList() {
     auto* list = findList(get_gameObject()); if (!list) return;
     list->data.clear();
     for (auto& s : _songs)
-        list->data.push_back(BSML::CustomCellInfo::construct(StringW(s.title), StringW(s.artist), nullptr));
+        list->data.push_back(BSML::CustomCellInfo::construct(
+            StringW(s.title), StringW(s.artist), nullptr));
     list->tableView->ReloadData();
 }
 void LibraryViewController::refreshAlbumList() {
@@ -59,7 +66,9 @@ void LibraryViewController::refreshAlbumList() {
     list->data.clear();
     for (auto& a : _albums)
         list->data.push_back(BSML::CustomCellInfo::construct(
-            StringW(a.title), StringW(a.artist + " · " + std::to_string(a.trackCount) + " tracks"), nullptr));
+            StringW(a.title),
+            StringW(a.artist + (a.trackCount ? " · " + std::to_string(a.trackCount) + " tracks" : "")),
+            nullptr));
     list->tableView->ReloadData();
 }
 void LibraryViewController::refreshPlaylistList() {
@@ -67,7 +76,7 @@ void LibraryViewController::refreshPlaylistList() {
     list->data.clear();
     for (auto& p : _playlists)
         list->data.push_back(BSML::CustomCellInfo::construct(
-            StringW(p.name), StringW(std::to_string(p.trackCount) + " songs"), nullptr));
+            StringW(p.name), StringW(""), nullptr));
     list->tableView->ReloadData();
 }
 
@@ -77,11 +86,10 @@ void LibraryViewController::onPlaylistsTabClicked() { _activeTab = 2; refreshPla
 void LibraryViewController::onRefreshClicked()      { refresh(); }
 
 static AppleMusicSearch::UI::FlowCoordinators::AppleMusicFlowCoordinator* getFC() {
-    return [&]{ 
-    auto _w = BSML::Helpers::GetMainFlowCoordinator()->YoungestChildFlowCoordinatorOrSelf(); 
-    HMUI::FlowCoordinator* _raw = _w; 
-    return il2cpp_utils::try_cast<AppleMusicSearch::UI::FlowCoordinators::AppleMusicFlowCoordinator>(_raw).value_or(nullptr); 
-}();
+    auto _w = BSML::Helpers::GetMainFlowCoordinator()->YoungestChildFlowCoordinatorOrSelf();
+    HMUI::FlowCoordinator* _raw = _w;
+    return il2cpp_utils::try_cast<
+        AppleMusicSearch::UI::FlowCoordinators::AppleMusicFlowCoordinator>(_raw).value_or(nullptr);
 }
 
 void LibraryViewController::onSongCellSelected(int index) {
@@ -95,9 +103,9 @@ void LibraryViewController::onPlaylistCellSelected(int index) {
     if (auto fc = getFC()) fc->showPlaylistTracks(_playlists[index]);
 }
 
-bool    LibraryViewController::get_isLoading()            { return _isLoading; }
-void    LibraryViewController::set_isLoading(bool v)      { _isLoading = v; }
-StringW LibraryViewController::get_statusText()           { return StringW(_statusText); }
-void    LibraryViewController::set_statusText(StringW v)  { _statusText = static_cast<std::string>(v); }
+bool    LibraryViewController::get_isLoading()           { return _isLoading; }
+void    LibraryViewController::set_isLoading(bool v)     { _isLoading = v; }
+StringW LibraryViewController::get_statusText()          { return StringW(_statusText); }
+void    LibraryViewController::set_statusText(StringW v) { _statusText = static_cast<std::string>(v); }
 
 }

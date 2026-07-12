@@ -3,8 +3,6 @@
 #include "HMUI/FlowCoordinator.hpp"
 #include "HMUI/ViewController.hpp"
 #include "AppleMusic/Models.hpp"
-// Full includes needed — DECLARE_INSTANCE_FIELD requires complete types
-#include "UI/ViewControllers/ServiceSelectViewController.hpp"
 #include "UI/ViewControllers/LibraryViewController.hpp"
 #include "UI/ViewControllers/SearchViewController.hpp"
 #include "UI/ViewControllers/PlaylistTracksViewController.hpp"
@@ -17,17 +15,15 @@ DECLARE_CLASS_CODEGEN(AppleMusicSearch::UI::FlowCoordinators, AppleMusicFlowCoor
     DECLARE_OVERRIDE_METHOD_MATCH(void, BackButtonWasPressed, &HMUI::FlowCoordinator::BackButtonWasPressed,
         HMUI::ViewController* topViewController);
 
-    DECLARE_INSTANCE_FIELD(UnityW<AppleMusicSearch::UI::ViewControllers::ServiceSelectViewController>,  _serviceSelect);
-    DECLARE_INSTANCE_FIELD(UnityW<AppleMusicSearch::UI::ViewControllers::LibraryViewController>,        _library);
-    DECLARE_INSTANCE_FIELD(UnityW<AppleMusicSearch::UI::ViewControllers::SearchViewController>,         _search);
-    DECLARE_INSTANCE_FIELD(UnityW<AppleMusicSearch::UI::ViewControllers::PlaylistTracksViewController>, _playlistTracks);
+    DECLARE_INSTANCE_FIELD(UnityW<AppleMusicSearch::UI::ViewControllers::LibraryViewController>,          _library);
+    DECLARE_INSTANCE_FIELD(UnityW<AppleMusicSearch::UI::ViewControllers::SearchViewController>,           _search);
+    DECLARE_INSTANCE_FIELD(UnityW<AppleMusicSearch::UI::ViewControllers::PlaylistTracksViewController>,   _playlistTracks);
     DECLARE_INSTANCE_FIELD(UnityW<AppleMusicSearch::UI::ViewControllers::BeatSaverResultsViewController>, _bsResults);
 
 public:
-    void showAppleMusicHome();
     void showPlaylistTracks(const AMPlaylist& playlist);
     void showBeatSaverResults(const std::string& title, const std::string& artist);
-    void popToAppleMusicHome();
+    void popToLibrary();
     void popToPreviousView();
     void reset();
 };

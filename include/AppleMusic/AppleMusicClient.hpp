@@ -14,18 +14,23 @@ using PlaylistsCallback = std::function<void(std::vector<AMPlaylist>, std::strin
 class AppleMusicClient {
 public:
     static AppleMusicClient& instance();
-    void setServerAddress(const std::string& address);
-    const std::string& serverAddress() const;
+
     void search(const std::string& term, SongsCallback cb);
     void fetchLibrarySongs(SongsCallback cb);
     void fetchLibraryAlbums(AlbumsCallback cb);
     void fetchLibraryPlaylists(PlaylistsCallback cb);
     void fetchPlaylistTracks(const std::string& playlistId, SongsCallback cb);
+
 private:
     AppleMusicClient() = default;
-    void get(const std::string& path,
-             std::function<void(const rapidjson::Document*, std::string)> cb);
-    std::string _serverAddress;
+
+    // Ensures JWT is ready, then calls cb(jwt). Runs cb on main thread.
+    void withJwt(std::function<void(std::string)> cb);
+
+    void apiGet(const std::string& url, bool needsMut,
+                std::function<void(const rapidjson::Document*, std::string)> cb);
+
+    std::string _jwt; // in-memory cache
 };
 
 }

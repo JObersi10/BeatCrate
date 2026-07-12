@@ -8,7 +8,11 @@ namespace AppleMusicSearch {
 static modloader::ModInfo modInfo{MOD_ID, VERSION, 0};
 
 Configuration& getConfig();
-std::string getServerAddress();
-void setServerAddress(const std::string& address);
+std::string getMut();
+void        setMut(const std::string& v);
+std::string getCachedJwt();
+void        setCachedJwt(const std::string& v);
+std::string getStorefront();
+void        setStorefront(const std::string& v);
 
 }

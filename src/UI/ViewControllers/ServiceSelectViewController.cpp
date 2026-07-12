@@ -1,61 +1,44 @@
 #include "UI/ViewControllers/ServiceSelectViewController.hpp"
-#include "UI/FlowCoordinators/AppleMusicFlowCoordinator.hpp"
 #include "Configuration.hpp"
-#include "AppleMusic/AppleMusicClient.hpp"
 #include "Log.hpp"
+#include "assets.hpp"
 
 #include "bsml/shared/BSML.hpp"
-#include "bsml/shared/Helpers/getters.hpp"
-#include "HMUI/ViewController.hpp"
-
-// Asset is embedded at build time via cmake/assets.cmake
-#include "assets.hpp"
+#include "UnityEngine/GUIUtility.hpp"
 
 DEFINE_TYPE(AppleMusicSearch::UI::ViewControllers, ServiceSelectViewController);
 
 namespace AppleMusicSearch::UI::ViewControllers {
 
-void ServiceSelectViewController::DidActivate(bool firstActivation,
-                                              bool addedToHierarchy,
-                                              bool screenSystemEnabling) {
+void ServiceSelectViewController::DidActivate(bool firstActivation, bool, bool) {
     if (!firstActivation) return;
-
-    // Load saved server address into client
-    auto addr = AppleMusicSearch::getServerAddress();
-    AppleMusicClient::instance().setServerAddress(addr);
-
     BSML::parse_and_construct(IncludedAssets::ServiceSelectViewController_bsml,
                               get_transform(), this);
+    std::string mut = getMut();
+    set_mutStatus(StringW(mut.empty() ? "Not set" : "Set (" + std::to_string(mut.size()) + " chars)"));
 }
 
-StringW ServiceSelectViewController::get_serverAddress() {
-    return StringW(AppleMusicSearch::getServerAddress());
+void ServiceSelectViewController::onPasteMut() {
+    auto clip = UnityEngine::GUIUtility::get_systemCopyBuffer();
+    std::string s = static_cast<std::string>(clip);
+    if (s.empty()) { set_mutStatus(StringW("Clipboard empty")); return; }
+    setMut(s);
+    set_mutStatus(StringW("Set (" + std::to_string(s.size()) + " chars)"));
+    AMS_LOG("MUT pasted ({} chars)", s.size());
 }
 
-void ServiceSelectViewController::set_serverAddress(StringW value) {
-    // handled by onServerAddressSet
+void ServiceSelectViewController::onMutChanged() {
+    // string-setting fires this on confirm — re-read binding value
+    std::string mut = static_cast<std::string>(get_mutToken());
+    if (!mut.empty()) {
+        setMut(mut);
+        set_mutStatus(StringW("Set (" + std::to_string(mut.size()) + " chars)"));
+    }
 }
 
-void ServiceSelectViewController::onAppleMusicClicked() {
-    auto fc = [&]{ 
-    auto _w = BSML::Helpers::GetMainFlowCoordinator()->YoungestChildFlowCoordinatorOrSelf(); 
-    HMUI::FlowCoordinator* _raw = _w; 
-    return il2cpp_utils::try_cast<AppleMusicSearch::UI::FlowCoordinators::AppleMusicFlowCoordinator>(_raw).value_or(nullptr); 
-}();
-    if (fc) fc->showAppleMusicHome();
-}
-
-void ServiceSelectViewController::onSpotifyClicked() {
-    AMS_LOG("Spotify tapped — coming soon");
-}
-
-void ServiceSelectViewController::onServerAddressSet() {
-    // The BSML string-setting fires this after the user confirms
-    // Re-read from the property binding
-    std::string addr = static_cast<std::string>(get_serverAddress());
-    AppleMusicSearch::setServerAddress(addr);
-    AppleMusicClient::instance().setServerAddress(addr);
-    AMS_LOG("Server address updated to {}", addr);
-}
+StringW ServiceSelectViewController::get_mutToken()           { return StringW(getMut()); }
+void    ServiceSelectViewController::set_mutToken(StringW v)  { /* handled by onMutChanged */ }
+StringW ServiceSelectViewController::get_mutStatus()          { return StringW(_mutStatus); }
+void    ServiceSelectViewController::set_mutStatus(StringW v) { _mutStatus = static_cast<std::string>(v); }
 
 }

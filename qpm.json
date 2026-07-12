@@ -6,7 +6,7 @@
   "info": {
     "name": "BeatCrate",
     "id": "apple-music-search",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "url": "https://github.com/JObersi10/BeatCrate",
     "additionalData": {
       "overrideSoName": "libapple-music-search.so",
