@@ -9,13 +9,12 @@
 #include "bsml/shared/BSML-Lite.hpp"
 #include "bsml/shared/Helpers/creation.hpp"
 #include "bsml/shared/Helpers/getters.hpp"
-#include "Zenject/DiContainer.hpp"
 
 DEFINE_TYPE(AppleMusicSearch::UI::FlowCoordinators, AppleMusicFlowCoordinator);
 
 namespace AppleMusicSearch::UI::FlowCoordinators {
 
-// ── Lifecycle ────────────────────────────────────────────────────────────────
+using namespace AppleMusicSearch::UI::ViewControllers;
 
 void AppleMusicFlowCoordinator::DidActivate(bool firstActivation,
                                             bool addedToHierarchy,
@@ -31,50 +30,53 @@ void AppleMusicFlowCoordinator::DidActivate(bool firstActivation,
     _playlistTracks = BSML::Helpers::CreateViewController<PlaylistTracksViewController*>();
     _bsResults      = BSML::Helpers::CreateViewController<BeatSaverResultsViewController*>();
 
-    // Start on the service-select screen (center only, no left/right panels)
     ProvideInitialViewControllers(_serviceSelect, nullptr, nullptr, nullptr, nullptr);
 }
 
 void AppleMusicFlowCoordinator::BackButtonWasPressed(HMUI::ViewController* /*top*/) {
-    parentFlowCoordinator->DismissFlowCoordinator(this,
-        HMUI::ViewController::AnimationType::Out, nullptr, false);
+    _parentFlowCoordinator->DismissFlowCoordinator(this,
+        HMUI::ViewController_AnimationDirection::Vertical, nullptr, false);
 }
 
-// ── Navigation helpers called by child VCs ───────────────────────────────────
-
-// Show Apple Music home: Library (left) + Search (right)
 void AppleMusicFlowCoordinator::showAppleMusicHome() {
     SetTitle("Apple Music", HMUI::ViewController::AnimationType::In);
-    ReplaceTopViewController(_library,  this, this, nullptr,
-                             HMUI::ViewController::AnimationType::In);
-    SetLeftScreenViewController(_library, HMUI::ViewController::AnimationType::In);
-    SetRightScreenViewController(_search,  HMUI::ViewController::AnimationType::In);
+    ReplaceTopViewController(_library, nullptr,
+        HMUI::ViewController::AnimationType::In,
+        HMUI::ViewController_AnimationDirection::Vertical);
+    SetLeftScreenViewController(nullptr, HMUI::ViewController::AnimationType::Out);
+    SetRightScreenViewController(nullptr, HMUI::ViewController::AnimationType::Out);
 }
 
-// Drill into a playlist's tracks
 void AppleMusicFlowCoordinator::showPlaylistTracks(const AMPlaylist& playlist) {
     _playlistTracks->loadPlaylist(playlist);
-    PushViewController(_playlistTracks, HMUI::ViewController::AnimationType::In);
+    ReplaceTopViewController(_playlistTracks, nullptr,
+        HMUI::ViewController::AnimationType::In,
+        HMUI::ViewController_AnimationDirection::Horizontal);
 }
 
-// Show BeatSaver results panel for a tapped song
 void AppleMusicFlowCoordinator::showBeatSaverResults(const std::string& title,
                                                       const std::string& artist) {
     _bsResults->searchFor(title, artist);
-    PushViewController(_bsResults, HMUI::ViewController::AnimationType::In);
+    ReplaceTopViewController(_bsResults, nullptr,
+        HMUI::ViewController::AnimationType::In,
+        HMUI::ViewController_AnimationDirection::Horizontal);
 }
 
 void AppleMusicFlowCoordinator::popToAppleMusicHome() {
-    PopViewController(HMUI::ViewController::AnimationType::Out);
+    ReplaceTopViewController(_library, nullptr,
+        HMUI::ViewController::AnimationType::Out,
+        HMUI::ViewController_AnimationDirection::Horizontal);
 }
 
 void AppleMusicFlowCoordinator::popToPreviousView() {
-    PopViewController(HMUI::ViewController::AnimationType::Out);
+    ReplaceTopViewController(_library, nullptr,
+        HMUI::ViewController::AnimationType::Out,
+        HMUI::ViewController_AnimationDirection::Horizontal);
 }
 
 void AppleMusicFlowCoordinator::reset() {
-    parentFlowCoordinator->DismissFlowCoordinator(this,
-        HMUI::ViewController::AnimationType::Out, nullptr, false);
+    _parentFlowCoordinator->DismissFlowCoordinator(this,
+        HMUI::ViewController_AnimationDirection::Vertical, nullptr, false);
 }
 
 }

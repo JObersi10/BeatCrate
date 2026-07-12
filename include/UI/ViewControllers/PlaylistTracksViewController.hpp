@@ -1,7 +1,6 @@
 #pragma once
 #include "custom-types/shared/macros.hpp"
 #include "HMUI/ViewController.hpp"
-#include "HMUI/TableView.hpp"
 #include "AppleMusic/Models.hpp"
 #include <vector>
 #include <string>
@@ -10,7 +9,7 @@ DECLARE_CLASS_CODEGEN(AppleMusicSearch::UI::ViewControllers, PlaylistTracksViewC
     DECLARE_OVERRIDE_METHOD_MATCH(void, DidActivate, &HMUI::ViewController::DidActivate,
         bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
 
-    DECLARE_INSTANCE_METHOD(void, onTrackCellSelected, UnityW<HMUI::TableView> table, int index);
+    DECLARE_INSTANCE_METHOD(void, onTrackCellSelected, int index);
     DECLARE_INSTANCE_METHOD(void, onBackClicked);
 
 public:

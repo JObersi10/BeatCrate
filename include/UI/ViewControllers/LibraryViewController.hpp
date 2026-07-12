@@ -1,7 +1,6 @@
 #pragma once
 #include "custom-types/shared/macros.hpp"
 #include "HMUI/ViewController.hpp"
-#include "HMUI/TableView.hpp"
 #include "AppleMusic/Models.hpp"
 #include <vector>
 #include <string>
@@ -14,9 +13,9 @@ DECLARE_CLASS_CODEGEN(AppleMusicSearch::UI::ViewControllers, LibraryViewControll
     DECLARE_INSTANCE_METHOD(void, onAlbumsTabClicked);
     DECLARE_INSTANCE_METHOD(void, onPlaylistsTabClicked);
     DECLARE_INSTANCE_METHOD(void, onRefreshClicked);
-    DECLARE_INSTANCE_METHOD(void, onSongCellSelected, UnityW<HMUI::TableView> table, int index);
-    DECLARE_INSTANCE_METHOD(void, onAlbumCellSelected, UnityW<HMUI::TableView> table, int index);
-    DECLARE_INSTANCE_METHOD(void, onPlaylistCellSelected, UnityW<HMUI::TableView> table, int index);
+    DECLARE_INSTANCE_METHOD(void, onSongCellSelected, int index);
+    DECLARE_INSTANCE_METHOD(void, onAlbumCellSelected, int index);
+    DECLARE_INSTANCE_METHOD(void, onPlaylistCellSelected, int index);
 
 public:
     void refresh();

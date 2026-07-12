@@ -1,7 +1,6 @@
 #pragma once
 #include "custom-types/shared/macros.hpp"
 #include "HMUI/ViewController.hpp"
-#include "HMUI/TableView.hpp"
 #include "AppleMusic/Models.hpp"
 #include <vector>
 #include <string>
@@ -12,7 +11,7 @@ DECLARE_CLASS_CODEGEN(AppleMusicSearch::UI::ViewControllers, SearchViewControlle
 
     DECLARE_INSTANCE_METHOD(void, onSearchSubmitted);
     DECLARE_INSTANCE_METHOD(void, onClearClicked);
-    DECLARE_INSTANCE_METHOD(void, onResultCellSelected, UnityW<HMUI::TableView> table, int index);
+    DECLARE_INSTANCE_METHOD(void, onResultCellSelected, int index);
 
 public:
     StringW get_searchQuery();  void set_searchQuery(StringW v);
