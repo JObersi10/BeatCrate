@@ -15,13 +15,17 @@ DEFINE_TYPE(AppleMusicSearch::UI::FlowCoordinators, AppleMusicFlowCoordinator);
 namespace AppleMusicSearch::UI::FlowCoordinators {
 
 using namespace AppleMusicSearch::UI::ViewControllers;
+using AT = HMUI::ViewController::AnimationType;
+using AD = HMUI::ViewController::AnimationDirection;
 
-void AppleMusicFlowCoordinator::DidActivate(bool firstActivation,
-                                            bool addedToHierarchy,
-                                            bool screenSystemEnabling) {
+// 6-arg form: (vc, finishedCallback, animationController, contentVC, AnimationType, AnimationDirection)
+#define REPLACE(vc, type, dir) \
+    ReplaceTopViewController(vc, this, this, nullptr, AT::type, AD::dir)
+
+void AppleMusicFlowCoordinator::DidActivate(bool firstActivation, bool, bool) {
     if (!firstActivation) return;
 
-    SetTitle("Music Search", HMUI::ViewController::AnimationType::In);
+    SetTitle("Music Search", AT::In);
     showBackButton = true;
 
     _serviceSelect  = BSML::Helpers::CreateViewController<ServiceSelectViewController*>();
@@ -33,50 +37,38 @@ void AppleMusicFlowCoordinator::DidActivate(bool firstActivation,
     ProvideInitialViewControllers(_serviceSelect, nullptr, nullptr, nullptr, nullptr);
 }
 
-void AppleMusicFlowCoordinator::BackButtonWasPressed(HMUI::ViewController* /*top*/) {
+void AppleMusicFlowCoordinator::BackButtonWasPressed(HMUI::ViewController*) {
     _parentFlowCoordinator->DismissFlowCoordinator(this,
-        HMUI::ViewController_AnimationDirection::Vertical, nullptr, false);
+        AD::Vertical, nullptr, false);
 }
 
 void AppleMusicFlowCoordinator::showAppleMusicHome() {
-    SetTitle("Apple Music", HMUI::ViewController::AnimationType::In);
-    ReplaceTopViewController(_library, nullptr,
-        HMUI::ViewController::AnimationType::In,
-        HMUI::ViewController_AnimationDirection::Vertical);
-    SetLeftScreenViewController(nullptr, HMUI::ViewController::AnimationType::Out);
-    SetRightScreenViewController(nullptr, HMUI::ViewController::AnimationType::Out);
+    SetTitle("Apple Music", AT::In);
+    REPLACE(_library, In, Vertical);
 }
 
 void AppleMusicFlowCoordinator::showPlaylistTracks(const AMPlaylist& playlist) {
     _playlistTracks->loadPlaylist(playlist);
-    ReplaceTopViewController(_playlistTracks, nullptr,
-        HMUI::ViewController::AnimationType::In,
-        HMUI::ViewController_AnimationDirection::Horizontal);
+    REPLACE(_playlistTracks, In, Horizontal);
 }
 
 void AppleMusicFlowCoordinator::showBeatSaverResults(const std::string& title,
                                                       const std::string& artist) {
     _bsResults->searchFor(title, artist);
-    ReplaceTopViewController(_bsResults, nullptr,
-        HMUI::ViewController::AnimationType::In,
-        HMUI::ViewController_AnimationDirection::Horizontal);
+    REPLACE(_bsResults, In, Horizontal);
 }
 
 void AppleMusicFlowCoordinator::popToAppleMusicHome() {
-    ReplaceTopViewController(_library, nullptr,
-        HMUI::ViewController::AnimationType::Out,
-        HMUI::ViewController_AnimationDirection::Horizontal);
+    REPLACE(_library, Out, Horizontal);
 }
 
 void AppleMusicFlowCoordinator::popToPreviousView() {
-    ReplaceTopViewController(_library, nullptr,
-        HMUI::ViewController::AnimationType::Out,
-        HMUI::ViewController_AnimationDirection::Horizontal);
+    REPLACE(_library, Out, Horizontal);
 }
 
 void AppleMusicFlowCoordinator::reset() {
     _parentFlowCoordinator->DismissFlowCoordinator(this,
-        HMUI::ViewController_AnimationDirection::Vertical, nullptr, false);
+        AD::Vertical, nullptr, false);
 }
 
 }
