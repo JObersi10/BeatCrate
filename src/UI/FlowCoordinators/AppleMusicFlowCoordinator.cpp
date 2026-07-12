@@ -18,9 +18,8 @@ using namespace AppleMusicSearch::UI::ViewControllers;
 using AT = HMUI::ViewController::AnimationType;
 using AD = HMUI::ViewController::AnimationDirection;
 
-// 6-arg form: (vc, finishedCallback, animationController, contentVC, AnimationType, AnimationDirection)
 #define REPLACE(vc, type, dir) \
-    ReplaceTopViewController(vc, this, this, nullptr, AT::type, AD::dir)
+    ReplaceTopViewController(vc, nullptr, AT::type, AD::dir)
 
 void AppleMusicFlowCoordinator::DidActivate(bool firstActivation, bool, bool) {
     if (!firstActivation) return;
@@ -38,8 +37,7 @@ void AppleMusicFlowCoordinator::DidActivate(bool firstActivation, bool, bool) {
 }
 
 void AppleMusicFlowCoordinator::BackButtonWasPressed(HMUI::ViewController*) {
-    _parentFlowCoordinator->DismissFlowCoordinator(this,
-        AD::Vertical, nullptr, false);
+    _parentFlowCoordinator->DismissFlowCoordinator(this, AD::Vertical, nullptr, false);
 }
 
 void AppleMusicFlowCoordinator::showAppleMusicHome() {
@@ -67,8 +65,7 @@ void AppleMusicFlowCoordinator::popToPreviousView() {
 }
 
 void AppleMusicFlowCoordinator::reset() {
-    _parentFlowCoordinator->DismissFlowCoordinator(this,
-        AD::Vertical, nullptr, false);
+    _parentFlowCoordinator->DismissFlowCoordinator(this, AD::Vertical, nullptr, false);
 }
 
 }
