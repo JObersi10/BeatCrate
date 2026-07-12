@@ -1,33 +1,41 @@
-# Generate assets.hpp from files in the assets/ directory.
-# Text files (.bsml, .xml, etc.) are embedded as C++11 raw string literals.
-# Binary files (.png, etc.) are embedded as hex byte arrays.
+# Generate assets.hpp from .bsml files in the assets/ directory.
+# Uses a Python one-liner so no cmake regex is needed.
 
 function(embed_assets TARGET ASSETS_DIR)
-    file(GLOB ASSET_FILES "${ASSETS_DIR}/*")
+    file(GLOB BSML_FILES "${ASSETS_DIR}/*.bsml")
 
     set(OUT_HPP "${CMAKE_CURRENT_BINARY_DIR}/assets.hpp")
 
-    file(WRITE "${OUT_HPP}" "#pragma once\n#include <string_view>\nnamespace IncludedAssets {\n")
+    # Build python script as a cmake string to avoid escaping issues
+    set(PY_SCRIPT [=[
+import sys, os, pathlib
+out = pathlib.Path(sys.argv[1])
+assets_dir = pathlib.Path(sys.argv[2])
+lines = ["#pragma once\n", "#include <string_view>\n", "namespace IncludedAssets {\n"]
+for f in sorted(assets_dir.glob("*.bsml")):
+    varname = f.name.replace(".", "_")
+    content = f.read_text(encoding="utf-8")
+    # Use a raw-string delimiter unlikely to appear in XML
+    lines.append(f"inline constexpr std::string_view {varname} = R\"BCASSET({content})BCASSET\";\n")
+lines.append("}\n")
+out.write_text("".join(lines), encoding="utf-8")
+print(f"Generated {out} with {len(lines)-3} assets")
+]=])
 
-    foreach(F IN LISTS ASSET_FILES)
-        get_filename_component(FNAME "${F}" NAME)
-        get_filename_component(FEXT  "${F}" EXT)
-        string(REPLACE "." "_" VARNAME "${FNAME}")
+    set(PY_SCRIPT_PATH "${CMAKE_CURRENT_BINARY_DIR}/gen_assets.py")
+    file(WRITE "${PY_SCRIPT_PATH}" "${PY_SCRIPT}")
 
-        if(FEXT STREQUAL ".bsml" OR FEXT STREQUAL ".xml" OR FEXT STREQUAL ".json" OR FEXT STREQUAL ".txt")
-            # Text file — embed as raw string literal (delimiter BCASSET is unlikely to appear in XML)
-            file(READ "${F}" CONTENT)
-            file(APPEND "${OUT_HPP}" "inline constexpr std::string_view ${VARNAME} = R\"BCASSET(${CONTENT})BCASSET\";\n")
-        else()
-            # Binary file — emit as uint8_t array + string_view over it
-            file(READ "${F}" CONTENT HEX)
-            string(REGEX REPLACE "([0-9a-fA-F][0-9a-fA-F])" "0x\\1," BYTES "${CONTENT}")
-            file(APPEND "${OUT_HPP}" "inline constexpr uint8_t _${VARNAME}_data[] = {${BYTES}};\n")
-            file(APPEND "${OUT_HPP}" "inline constexpr std::string_view ${VARNAME}(reinterpret_cast<const char*>(_${VARNAME}_data), sizeof(_${VARNAME}_data));\n")
-        endif()
-    endforeach()
+    execute_process(
+        COMMAND python3 "${PY_SCRIPT_PATH}" "${OUT_HPP}" "${ASSETS_DIR}"
+        RESULT_VARIABLE PY_RESULT
+        OUTPUT_VARIABLE PY_OUTPUT
+        ERROR_VARIABLE  PY_ERROR
+    )
 
-    file(APPEND "${OUT_HPP}" "}\n")
+    if(NOT PY_RESULT EQUAL 0)
+        message(FATAL_ERROR "gen_assets.py failed:\n${PY_ERROR}")
+    endif()
+    message(STATUS "${PY_OUTPUT}")
 
     target_include_directories(${TARGET} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 endfunction()
