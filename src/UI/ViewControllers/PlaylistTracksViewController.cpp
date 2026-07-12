@@ -41,9 +41,11 @@ void PlaylistTracksViewController::loadPlaylist(const AMPlaylist& playlist) {
 }
 
 static AppleMusicSearch::UI::FlowCoordinators::AppleMusicFlowCoordinator* getFC() {
-    return il2cpp_utils::try_cast<AppleMusicSearch::UI::FlowCoordinators::AppleMusicFlowCoordinator>(
-        BSML::Helpers::GetMainFlowCoordinator()->YoungestChildFlowCoordinatorOrSelf()
-    ).value_or(nullptr);
+    return [&]{ 
+    auto _w = BSML::Helpers::GetMainFlowCoordinator()->YoungestChildFlowCoordinatorOrSelf(); 
+    HMUI::FlowCoordinator* _raw = _w; 
+    return il2cpp_utils::try_cast<AppleMusicSearch::UI::FlowCoordinators::AppleMusicFlowCoordinator>(_raw).value_or(nullptr); 
+}();
 }
 
 void PlaylistTracksViewController::onTrackCellSelected(int index) {

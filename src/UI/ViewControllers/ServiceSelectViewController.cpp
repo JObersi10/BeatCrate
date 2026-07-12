@@ -38,9 +38,11 @@ void ServiceSelectViewController::set_serverAddress(StringW value) {
 }
 
 void ServiceSelectViewController::onAppleMusicClicked() {
-    auto fc = il2cpp_utils::try_cast<AppleMusicSearch::UI::FlowCoordinators::AppleMusicFlowCoordinator>(
-        BSML::Helpers::GetMainFlowCoordinator()->YoungestChildFlowCoordinatorOrSelf()
-    ).value_or(nullptr);
+    auto fc = [&]{ 
+    auto _w = BSML::Helpers::GetMainFlowCoordinator()->YoungestChildFlowCoordinatorOrSelf(); 
+    HMUI::FlowCoordinator* _raw = _w; 
+    return il2cpp_utils::try_cast<AppleMusicSearch::UI::FlowCoordinators::AppleMusicFlowCoordinator>(_raw).value_or(nullptr); 
+}();
     if (fc) fc->showAppleMusicHome();
 }
 
