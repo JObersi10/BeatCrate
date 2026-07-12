@@ -19,8 +19,9 @@ void SearchViewController::DidActivate(bool firstActivation, bool, bool) {
 }
 
 static AppleMusicSearch::UI::FlowCoordinators::AppleMusicFlowCoordinator* getFC() {
-    auto* child = BSML::Helpers::GetMainFlowCoordinator()->YoungestChildFlowCoordinatorOrSelf();
-    return il2cpp_utils::try_cast<AppleMusicSearch::UI::FlowCoordinators::AppleMusicFlowCoordinator>(child).value_or(nullptr);
+    return il2cpp_utils::try_cast<AppleMusicSearch::UI::FlowCoordinators::AppleMusicFlowCoordinator>(
+        BSML::Helpers::GetMainFlowCoordinator()->YoungestChildFlowCoordinatorOrSelf()
+    ).value_or(nullptr);
 }
 
 void SearchViewController::onSearchSubmitted() {
