@@ -1,50 +1,43 @@
 cmake_minimum_required(VERSION 3.22)
-project(apple-music-search)
 
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+option(QUEST "Build for Quest" ON)
 
-option(DEFINED_BS_QUEST "Build for Quest" ON)
-
+set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-include(extern/libs.cmake OPTIONAL RESULT_VARIABLE libs_result)
-if(NOT libs_result)
-    message(STATUS "No extern/libs.cmake found — run 'qpm restore' first")
+add_compile_options(-frtti -fexceptions -fvisibility=hidden -fPIE -fPIC)
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/utils.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/qpm.cmake)
+
+if(${CMAKE_BUILD_TYPE} MATCHES "^(Release|RelWithDebInfo|MinSizeRel)$")
+    add_compile_options(-O3 -flto)
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
-file(GLOB_RECURSE SOURCE_FILES
-    "${SOURCE_DIR}/*.cpp"
-    "${SOURCE_DIR}/**/*.cpp"
-)
+if(QUEST)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/targets/quest.cmake)
+endif()
 
-add_library(apple-music-search SHARED ${SOURCE_FILES})
+project(apple-music-search VERSION ${PACKAGE_VERSION})
 
-target_include_directories(apple-music-search PRIVATE
-    ${INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/extern/includes
-    ${CMAKE_CURRENT_SOURCE_DIR}/build
-)
+add_compile_definitions(MOD_ID="${CMAKE_PROJECT_NAME}")
+add_compile_definitions(VERSION="${CMAKE_PROJECT_VERSION}")
 
-target_compile_options(apple-music-search PRIVATE
-    -frtti
-    -fexceptions
-    -fPIC
-    -fvisibility=hidden
-    -O3
-    -flto
-)
+set(COMPILE_ID ${CMAKE_PROJECT_NAME})
 
-target_compile_definitions(apple-music-search PRIVATE
-    MOD_ID="${PROJECT_NAME}"
-    VERSION="1.0.0"
-)
+RECURSE_FILES(cpp_file_list ${SOURCE_DIR}/*.cpp)
+RECURSE_FILES(c_file_list   ${SOURCE_DIR}/*.c)
 
-target_link_libraries(apple-music-search
-    log
-    ssl
-    crypto
-)
+add_library(${CMAKE_PROJECT_NAME} SHARED ${cpp_file_list} ${c_file_list})
+target_compile_features(${CMAKE_PROJECT_NAME} PRIVATE cxx_std_23)
 
-include(cmake/assets.cmake OPTIONAL)
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${INCLUDE_DIR})
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${SHARED_DIR})
+
+RECURSE_FILES(inline_hook_c   ${EXTERN_DIR}/includes/beatsaber-hook/shared/inline-hook/*.c)
+RECURSE_FILES(inline_hook_cpp ${EXTERN_DIR}/includes/beatsaber-hook/shared/inline-hook/*.cpp)
+target_sources(${COMPILE_ID} PRIVATE ${inline_hook_c} ${inline_hook_cpp})
+
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE log)
