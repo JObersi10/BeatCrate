@@ -43,6 +43,5 @@ target_sources(${COMPILE_ID} PRIVATE ${inline_hook_c} ${inline_hook_cpp})
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE log)
 
 # Embed BSML asset files into assets.hpp
-include(${EXTERN_DIR}/includes/bsml/cmake/BSMLHelpers.cmake)
-bs_add_asset(${CMAKE_PROJECT_NAME} "assets" ${CMAKE_CURRENT_SOURCE_DIR}/assets)
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/assets.cmake)
+embed_assets(${CMAKE_PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/assets)
