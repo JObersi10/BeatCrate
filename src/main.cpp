@@ -29,11 +29,11 @@ MAKE_HOOK_MATCH(MainMenuViewController_DidActivate,
     BSML::Lite::CreateUIButton(self->get_transform(), "Music Search", []() {
         auto fc = BSML::Helpers::CreateFlowCoordinator<AppleMusicFlowCoordinator*>();
         BSML::Helpers::GetMainFlowCoordinator()->PresentFlowCoordinator(
-            fc, nullptr, HMUI::ViewController::AnimationType::In, false, false);
+            fc, nullptr, HMUI::ViewController_AnimationDirection::Vertical, false, false);
     });
 }
 
-MOD_EXTERN_FUNC void setup(CModInfo* info) noexcept {
+extern "C" void setup(CModInfo* info) noexcept {
     *info = AppleMusicSearch::modInfo.to_c();
     AppleMusicSearch::getConfig().Load();
     AppleMusicSearch::AppleMusicClient::instance()
@@ -41,7 +41,7 @@ MOD_EXTERN_FUNC void setup(CModInfo* info) noexcept {
     AMS_LOG("BeatCrate setup — server: {}", AppleMusicSearch::getServerAddress());
 }
 
-MOD_EXTERN_FUNC void late_load() noexcept {
+extern "C" void late_load() noexcept {
     il2cpp_functions::Init();
     custom_types::Register::AutoRegister();
     INSTALL_HOOK(AppleMusicSearch::logger, MainMenuViewController_DidActivate);

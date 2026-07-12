@@ -5,7 +5,6 @@
 #include "Log.hpp"
 
 #include "bsml/shared/BSML.hpp"
-#include "bsml/shared/Helpers/creation.hpp"
 #include "bsml/shared/Helpers/getters.hpp"
 #include "HMUI/ViewController.hpp"
 
@@ -47,8 +46,6 @@ void ServiceSelectViewController::onAppleMusicClicked() {
 }
 
 void ServiceSelectViewController::onSpotifyClicked() {
-    // Show "Coming Soon" toast — BSML floating notification
-    BSML::Lite::CreateFloatingScreen("Spotify is coming soon!", nullptr, {0,0,2}, {}, 0, true, true);
     AMS_LOG("Spotify tapped — coming soon");
 }
 

@@ -1,4 +1,3 @@
 #pragma once
 #include "beatsaber-hook/shared/utils/logging.hpp"
-
-extern ModInfo modInfo;
+#include "scotland2/shared/modloader.h"
