@@ -1,5 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/nicoco007/QuestPackageManager-Rust/main/resources/schemas/mod.schema.json",
+  "_QPMSchemaVersion": 1,
   "version": "1.0.0",
   "id": "apple-music-search",
   "name": "Apple Music Search",
