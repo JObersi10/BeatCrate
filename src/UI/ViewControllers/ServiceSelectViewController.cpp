@@ -6,6 +6,8 @@
 
 #include "bsml/shared/BSML-Lite.hpp"
 #include "bsml/shared/BSML/MainThreadScheduler.hpp"
+#include "bsml/shared/Helpers/creation.hpp"
+#include "bsml/shared/Helpers/getters.hpp"
 #include "HMUI/ViewController.hpp"
 
 // Asset is embedded at build time via cmake/assets.cmake

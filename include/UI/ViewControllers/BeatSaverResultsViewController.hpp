@@ -1,6 +1,7 @@
 #pragma once
 #include "custom-types/shared/macros.hpp"
 #include "HMUI/ViewController.hpp"
+#include "HMUI/TableView.hpp"
 #include "BeatSaver/BeatSaverClient.hpp"
 #include <vector>
 #include <string>

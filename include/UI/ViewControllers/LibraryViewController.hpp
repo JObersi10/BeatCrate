@@ -1,6 +1,7 @@
 #pragma once
 #include "custom-types/shared/macros.hpp"
 #include "HMUI/ViewController.hpp"
+#include "HMUI/TableView.hpp"
 #include "AppleMusic/Models.hpp"
 #include <vector>
 #include <string>

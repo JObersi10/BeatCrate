@@ -1,6 +1,6 @@
 #pragma once
 #include "Models.hpp"
-#include "rapidjson/document.h"
+#include "web-utils/shared/WebUtils.hpp"
 #include <functional>
 #include <string>
 #include <vector>
@@ -14,16 +14,13 @@ using PlaylistsCallback = std::function<void(std::vector<AMPlaylist>, std::strin
 class AppleMusicClient {
 public:
     static AppleMusicClient& instance();
-
     void setServerAddress(const std::string& address);
     const std::string& serverAddress() const;
-
     void search(const std::string& term, SongsCallback cb);
     void fetchLibrarySongs(SongsCallback cb);
     void fetchLibraryAlbums(AlbumsCallback cb);
     void fetchLibraryPlaylists(PlaylistsCallback cb);
     void fetchPlaylistTracks(const std::string& playlistId, SongsCallback cb);
-
 private:
     AppleMusicClient() = default;
     void get(const std::string& path,
