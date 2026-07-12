@@ -1,52 +1,47 @@
 {
-  "version": "1.0.0",
+  "$schema": "https://raw.githubusercontent.com/QuestPackageManager/QPM.Package/refs/heads/main/qpm.schema.json",
+  "version": "0.4.0",
+  "sharedDir": "shared",
+  "dependenciesDir": "extern",
   "info": {
-    "name": "Apple Music Search",
+    "name": "BeatCrate",
     "id": "apple-music-search",
-    "url": null,
+    "version": "1.0.0",
+    "url": "https://github.com/JObersi10/BeatCrate",
     "additionalData": {
-      "modlink": null,
-      "overrideSoName": "libapple-music-search.so"
+      "overrideSoName": "libapple-music-search.so",
+      "cmake": true
     }
   },
   "workspace": {
-    "package": {
-      "branchName": null,
-      "dependencyId": "apple-music-search",
-      "version": "1.0.0",
-      "additionalData": {}
-    },
-    "packagePath": ".",
-    "dependenciesDir": "extern",
-    "sharedDir": "shared",
-    "release": false,
-    "additionalData": {
-      "compileOptions": {
-        "includePaths": [
-          "./build",
-          "./extern/libs"
-        ],
-        "systemIncludes": [],
-        "cppFeatures": [],
-        "cppFlags": [
-          "-frtti",
-          "-fexceptions"
-        ],
-        "cFlags": []
-      }
-    }
+    "qmodIncludeDirs": [
+      "./build",
+      "./extern/libs"
+    ],
+    "qmodIncludeFiles": [],
+    "qmodOutput": "./BeatCrate.qmod"
   },
   "dependencies": [
     {
       "id": "beatsaber-hook",
       "versionRange": "^6.4.2",
+      "additionalData": {}
+    },
+    {
+      "id": "scotland2",
+      "versionRange": "^0.1.4",
       "additionalData": {
-        "branchName": null
+        "includeQmod": false
       }
     },
     {
       "id": "bs-cordl",
       "versionRange": "^4008.0.0",
+      "additionalData": {}
+    },
+    {
+      "id": "paper2_scotland2",
+      "versionRange": "^4.7.0",
       "additionalData": {}
     },
     {
@@ -56,22 +51,27 @@
     },
     {
       "id": "custom-types",
-      "versionRange": "^0.4.0",
+      "versionRange": "^0.18.4",
       "additionalData": {}
     },
     {
       "id": "web-utils",
-      "versionRange": "^1.3.1",
-      "additionalData": {}
-    },
-    {
-      "id": "songcore",
-      "versionRange": "^1.4.0",
+      "versionRange": "^0.6.8",
       "additionalData": {}
     },
     {
       "id": "song-details",
-      "versionRange": "^2.0.0",
+      "versionRange": "^1.0.4",
+      "additionalData": {}
+    },
+    {
+      "id": "songcore",
+      "versionRange": "^1.1.25",
+      "additionalData": {}
+    },
+    {
+      "id": "metacore",
+      "versionRange": "^1.6.2",
       "additionalData": {}
     }
   ]
