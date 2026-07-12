@@ -111,7 +111,7 @@ static std::string fetchJwtSync() {
     const std::string& html = *htmlResp->responseData;
 
     // Find script path
-    std::regex scriptRe(R"(crossorigin src="(/assets/index\.[^"]+\.js)")");
+    std::regex scriptRe("crossorigin src=\"(/assets/index\\.[^\"]+\\.js)\"");
     std::smatch sm;
     if (!std::regex_search(html, sm, scriptRe)) {
         AMS_ERROR("JWT: script path not found in HTML");
