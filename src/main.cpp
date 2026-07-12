@@ -1,7 +1,7 @@
 #include "main.hpp"
 #include "Configuration.hpp"
-#include "AppleMusic/AppleMusicClient.hpp"
 #include "UI/FlowCoordinators/AppleMusicFlowCoordinator.hpp"
+#include "UI/ViewControllers/ServiceSelectViewController.hpp"
 #include "Log.hpp"
 
 #include "beatsaber-hook/shared/utils/hooking.hpp"
@@ -15,7 +15,7 @@
 #include "GlobalNamespace/MainMenuViewController.hpp"
 #include "HMUI/FlowCoordinator.hpp"
 
-using AppleMusicSearch::UI::FlowCoordinators::AppleMusicFlowCoordinator;
+using namespace AppleMusicSearch::UI;
 
 MAKE_HOOK_MATCH(MainMenuViewController_DidActivate,
                 &GlobalNamespace::MainMenuViewController::DidActivate,
@@ -27,7 +27,7 @@ MAKE_HOOK_MATCH(MainMenuViewController_DidActivate,
     if (!firstActivation) return;
 
     BSML::Lite::CreateUIButton(self->get_transform(), "Music Search", []() {
-        auto fc = BSML::Helpers::CreateFlowCoordinator<AppleMusicFlowCoordinator*>();
+        auto fc = BSML::Helpers::CreateFlowCoordinator<FlowCoordinators::AppleMusicFlowCoordinator*>();
         BSML::Helpers::GetMainFlowCoordinator()->PresentFlowCoordinator(
             fc, nullptr, HMUI::ViewController_AnimationDirection::Vertical, false, false);
     });
@@ -35,15 +35,13 @@ MAKE_HOOK_MATCH(MainMenuViewController_DidActivate,
 
 extern "C" void setup(CModInfo* info) noexcept {
     *info = AppleMusicSearch::modInfo.to_c();
-    AppleMusicSearch::getConfig().Load();
-    AppleMusicSearch::AppleMusicClient::instance()
-        .setServerAddress(AppleMusicSearch::getServerAddress());
-    AMS_LOG("BeatCrate setup — server: {}", AppleMusicSearch::getServerAddress());
+    AMS_LOG("BeatCrate setup");
 }
 
 extern "C" void late_load() noexcept {
     il2cpp_functions::Init();
     custom_types::Register::AutoRegister();
     INSTALL_HOOK(AppleMusicSearch::logger, MainMenuViewController_DidActivate);
+    BSML::Register::RegisterSettingsMenu<ViewControllers::ServiceSelectViewController*>("BeatCrate");
     AMS_LOG("BeatCrate loaded");
 }
