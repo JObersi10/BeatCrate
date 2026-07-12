@@ -21,12 +21,12 @@ static void openBeatCrate() {
     if (parent) parent->PresentFlowCoordinator(fc.ptr(), nullptr, HMUI::ViewController::AnimationDirection::Horizontal, false, false);
 }
 
-extern "C" void setup(CModInfo* info) noexcept {
+MOD_EXTERN_FUNC void setup(CModInfo* info) noexcept {
     *info = AppleMusicSearch::modInfo.to_c();
     AMS_LOG("BeatCrate setup");
 }
 
-extern "C" void late_load() noexcept {
+MOD_EXTERN_FUNC void late_load() noexcept {
     il2cpp_functions::Init();
     BSML::Init();
     custom_types::Register::AutoRegister();
