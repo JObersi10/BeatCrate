@@ -1,12 +1,7 @@
 name: Build
 
 on:
-  push:
-    branches: [main]
-    tags:
-      - 'v*'
-  pull_request:
-    branches: [main]
+  - push
 
 jobs:
   build:
@@ -15,34 +10,39 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
-      - name: Set up NDK
-        uses: nttld/setup-ndk@v1
-        id: setup-ndk
-        with:
-          ndk-version: r26d
-          add-to-path: true
-
-      - name: Install QPM
+      - name: Install dependencies
         run: |
-          wget -q https://github.com/QuestPackageManager/QPM.CLI/releases/latest/download/qpm-linux -O /usr/local/bin/qpm
-          chmod +x /usr/local/bin/qpm
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build
+
+          # QPM v1.5.8 (same version used by working BS mods)
+          TMP_DIR="/tmp/qpm"
+          mkdir -p "$TMP_DIR"
+          curl -L "https://github.com/QuestPackageManager/QPM.CLI/releases/download/v1.5.8/qpm-linux-x64.zip" \
+            -o "$TMP_DIR/qpm.zip"
+          unzip -o "$TMP_DIR/qpm.zip" -d "$TMP_DIR"
+          QPM_BIN=$(find "$TMP_DIR" -type f -name qpm)
+          chmod +x "$QPM_BIN"
+          sudo ln -sf "$QPM_BIN" /usr/local/bin/qpm
+
+          # NDK via QPM (NDK 27 — matches what working mods use)
+          qpm ndk download 27
+          NDK_PATH=$(qpm ndk list | grep -F "27." | awk '{print $3}')
+          echo "ANDROID_NDK_HOME=$NDK_PATH" >> $GITHUB_ENV
 
       - name: QPM restore
         run: qpm restore
 
-      - name: Read version from qpm.json
+      - name: Read version
         id: meta
-        run: |
-          VERSION=$(jq -r '.version' qpm.json)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+        run: echo "version=$(jq -r '.version' qpm.json)" >> $GITHUB_OUTPUT
 
       - name: Configure CMake
         run: |
           cmake -B build \
-            -DCMAKE_TOOLCHAIN_FILE=${{ steps.setup-ndk.outputs.ndk-path }}/build/cmake/android.toolchain.cmake \
+            -G Ninja \
+            -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake" \
             -DANDROID_ABI=arm64-v8a \
             -DANDROID_PLATFORM=android-26 \
             -DCMAKE_BUILD_TYPE=Release \
@@ -56,32 +56,28 @@ jobs:
           VERSION=${{ steps.meta.outputs.version }}
           QMOD="BeatCrate-v${VERSION}.qmod"
 
-          # Fill in mod.template.json → mod.json
-          sed "s/\"version\": \".*\"/\"version\": \"${VERSION}\"/" mod.template.json > mod.json
+          cp mod.template.json mod.json
 
-          # Collect files for the qmod zip
           mkdir -p package
           cp build/libapple-music-search.so package/
           cp mod.json package/
           [ -f assets/cover.png ] && cp assets/cover.png package/
 
           cd package && zip -r "../${QMOD}" . && cd ..
-
-          echo "QMOD_PATH=${QMOD}" >> $GITHUB_ENV
-          echo "QMOD_NAME=${QMOD}" >> $GITHUB_ENV
+          echo "QMOD=${QMOD}" >> $GITHUB_ENV
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: BeatCrate-qmod
-          path: ${{ env.QMOD_PATH }}
-          retention-days: 30
+          name: BeatCrate-v${{ steps.meta.outputs.version }}
+          path: ${{ env.QMOD }}
+          compression-level: 0
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ env.QMOD_PATH }}
+          files: ${{ env.QMOD }}
           generate_release_notes: true
           name: BeatCrate ${{ steps.meta.outputs.version }}
         env:
