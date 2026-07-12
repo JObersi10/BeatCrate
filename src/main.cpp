@@ -12,25 +12,13 @@
 #include "bsml/shared/Helpers/getters.hpp"
 #include "bsml/shared/Helpers/creation.hpp"
 
-#include "GlobalNamespace/MainMenuViewController.hpp"
-#include "HMUI/FlowCoordinator.hpp"
-
 using namespace AppleMusicSearch::UI;
 
-MAKE_HOOK_MATCH(MainMenuViewController_DidActivate,
-                &GlobalNamespace::MainMenuViewController::DidActivate,
-                void,
-                GlobalNamespace::MainMenuViewController* self,
-                bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-
-    MainMenuViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
-    if (!firstActivation) return;
-
-    BSML::Lite::CreateUIButton(self->get_transform(), "Music Search", []() {
-        auto fc = BSML::Helpers::CreateFlowCoordinator<FlowCoordinators::AppleMusicFlowCoordinator*>();
-        BSML::Helpers::GetMainFlowCoordinator()->PresentFlowCoordinator(
-            fc, nullptr, HMUI::ViewController_AnimationDirection::Vertical, false, false);
-    });
+static void openBeatCrate() {
+    static SafePtrUnity<FlowCoordinators::AppleMusicFlowCoordinator> fc;
+    if (!fc) fc = BSML::Helpers::CreateFlowCoordinator<FlowCoordinators::AppleMusicFlowCoordinator*>();
+    auto parent = BSML::Helpers::GetMainFlowCoordinator()->YoungestChildFlowCoordinatorOrSelf();
+    if (parent) parent->PresentFlowCoordinator(fc.ptr(), nullptr, HMUI::ViewController::AnimationDirection::Horizontal, false, false);
 }
 
 extern "C" void setup(CModInfo* info) noexcept {
@@ -40,8 +28,9 @@ extern "C" void setup(CModInfo* info) noexcept {
 
 extern "C" void late_load() noexcept {
     il2cpp_functions::Init();
+    BSML::Init();
     custom_types::Register::AutoRegister();
-    INSTALL_HOOK(AppleMusicSearch::logger, MainMenuViewController_DidActivate);
-    BSML::Register::RegisterSettingsMenu<ViewControllers::ServiceSelectViewController*>("BeatCrate");
+    BSML::Register::RegisterMenuButton("BeatCrate", "Browse your Apple Music library", openBeatCrate);
+    BSML::Register::RegisterSettingsMenu<ViewControllers::ServiceSelectViewController*>("BeatCrate", false);
     AMS_LOG("BeatCrate loaded");
 }
