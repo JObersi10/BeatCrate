@@ -7,9 +7,9 @@
 #include "bsml/shared/BSML-Lite.hpp"
 #include "bsml/shared/BSML/Components/CustomListTableData.hpp"
 
-DEFINE_TYPE(AppleMusicSearch::UI, BeatSaverResultsViewController);
+DEFINE_TYPE(AppleMusicSearch::UI::ViewControllers, BeatSaverResultsViewController);
 
-namespace AppleMusicSearch::UI {
+namespace AppleMusicSearch::UI::ViewControllers {
 
 void BeatSaverResultsViewController::DidActivate(bool firstActivation, bool, bool) {
     if (!firstActivation) return;

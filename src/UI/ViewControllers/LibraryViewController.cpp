@@ -7,9 +7,9 @@
 #include "bsml/shared/BSML-Lite.hpp"
 #include "bsml/shared/BSML/Components/CustomListTableData.hpp"
 
-DEFINE_TYPE(AppleMusicSearch::UI, LibraryViewController);
+DEFINE_TYPE(AppleMusicSearch::UI::ViewControllers, LibraryViewController);
 
-namespace AppleMusicSearch::UI {
+namespace AppleMusicSearch::UI::ViewControllers {
 
 void LibraryViewController::DidActivate(bool firstActivation,
                                         bool addedToHierarchy,

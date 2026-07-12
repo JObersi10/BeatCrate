@@ -7,9 +7,9 @@
 #include "bsml/shared/BSML-Lite.hpp"
 #include "bsml/shared/BSML/Components/CustomListTableData.hpp"
 
-DEFINE_TYPE(AppleMusicSearch::UI, PlaylistTracksViewController);
+DEFINE_TYPE(AppleMusicSearch::UI::ViewControllers, PlaylistTracksViewController);
 
-namespace AppleMusicSearch::UI {
+namespace AppleMusicSearch::UI::ViewControllers {
 
 void PlaylistTracksViewController::DidActivate(bool firstActivation, bool, bool) {
     if (!firstActivation) return;

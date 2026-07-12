@@ -9,9 +9,9 @@
 #include "bsml/shared/BSML-Lite.hpp"
 #include "Zenject/DiContainer.hpp"
 
-DEFINE_TYPE(AppleMusicSearch::UI, AppleMusicFlowCoordinator);
+DEFINE_TYPE(AppleMusicSearch::UI::FlowCoordinators, AppleMusicFlowCoordinator);
 
-namespace AppleMusicSearch::UI {
+namespace AppleMusicSearch::UI::FlowCoordinators {
 
 // ── Lifecycle ────────────────────────────────────────────────────────────────
 

@@ -11,9 +11,9 @@
 // Asset is embedded at build time via cmake/assets.cmake
 #include "assets.hpp"
 
-DEFINE_TYPE(AppleMusicSearch::UI, ServiceSelectViewController);
+DEFINE_TYPE(AppleMusicSearch::UI::ViewControllers, ServiceSelectViewController);
 
-namespace AppleMusicSearch::UI {
+namespace AppleMusicSearch::UI::ViewControllers {
 
 void ServiceSelectViewController::DidActivate(bool firstActivation,
                                               bool addedToHierarchy,
