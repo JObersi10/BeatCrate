@@ -76,10 +76,9 @@ void LibraryViewController::onAlbumsTabClicked()    { _activeTab = 1; refreshAlb
 void LibraryViewController::onPlaylistsTabClicked() { _activeTab = 2; refreshPlaylistList(); }
 void LibraryViewController::onRefreshClicked()      { refresh(); }
 
-static auto getFC() {
-    return BSML::Helpers::GetMainFlowCoordinator()
-               ->YoungestChildFlowCoordinatorOrSelf()
-               ->TryCast<FlowCoordinators::AppleMusicFlowCoordinator>();
+static AppleMusicSearch::UI::FlowCoordinators::AppleMusicFlowCoordinator* getFC() {
+    auto* child = BSML::Helpers::GetMainFlowCoordinator()->YoungestChildFlowCoordinatorOrSelf();
+    return il2cpp_utils::try_cast<AppleMusicSearch::UI::FlowCoordinators::AppleMusicFlowCoordinator>(child).value_or(nullptr);
 }
 
 void LibraryViewController::onSongCellSelected(int index) {

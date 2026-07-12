@@ -84,9 +84,8 @@ void BeatSaverResultsViewController::onDownloadClicked() {
 }
 
 void BeatSaverResultsViewController::onBackClicked() {
-    auto fc = BSML::Helpers::GetMainFlowCoordinator()
-                  ->YoungestChildFlowCoordinatorOrSelf()
-                  ->TryCast<FlowCoordinators::AppleMusicFlowCoordinator>();
+    auto* child = BSML::Helpers::GetMainFlowCoordinator()->YoungestChildFlowCoordinatorOrSelf();
+    auto fc = il2cpp_utils::try_cast<AppleMusicSearch::UI::FlowCoordinators::AppleMusicFlowCoordinator>(child).value_or(nullptr);
     if (fc) fc->popToPreviousView();
 }
 
