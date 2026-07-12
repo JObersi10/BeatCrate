@@ -1,0 +1,22 @@
+<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xsi:noNamespaceSchemaLocation='https://monkeymanboy.github.io/BSML-Docs/BSMLSchema.xsd'>
+
+  <vertical spacing='1' vertical-fit='PreferredSize'>
+
+    <horizontal spacing='2' pad-bottom='2'>
+      <button text='←' on-click='onBackClicked' preferred-width='10' preferred-height='8' font-size='3.5'/>
+      <text text='~playlistName' font-size='4' bold='true' overflow-mode='Ellipsis' rich-text='false'/>
+    </horizontal>
+
+    <loading-indicator active='~isLoading' preserve-aspect='true'/>
+    <text text='~statusText' font-size='3' color='#AAAAAA' align='Center'/>
+
+    <list id='trackList'
+          list-style='Simple'
+          cell-size='10'
+          select-cell='onTrackCellSelected'
+          visible-cells='7'
+          preferred-width='90'/>
+
+  </vertical>
+</bg>

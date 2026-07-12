@@ -1,0 +1,7 @@
+build/
+extern/
+.idea/
+*.so
+*.qmod
+*.zip
+mod.json

@@ -1,0 +1,40 @@
+<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xsi:noNamespaceSchemaLocation='https://monkeymanboy.github.io/BSML-Docs/BSMLSchema.xsd'>
+
+  <horizontal spacing='2' vertical-fit='PreferredSize'>
+
+    <!-- Left: results list (60%) -->
+    <vertical spacing='1' preferred-width='54'>
+      <horizontal spacing='2' pad-bottom='1'>
+        <button text='←' on-click='onBackClicked' preferred-width='10' preferred-height='8' font-size='3.5'/>
+        <text text='~queryLabel' font-size='3.2' color='#AAAAAA' overflow-mode='Ellipsis' rich-text='false'/>
+      </horizontal>
+
+      <loading-indicator active='~isLoading' preserve-aspect='true'/>
+      <text text='~statusText' font-size='3' color='#AAAAAA' align='Center'/>
+
+      <list id='mapList'
+            list-style='Simple'
+            cell-size='10'
+            select-cell='onMapCellSelected'
+            visible-cells='7'
+            preferred-width='54'/>
+    </vertical>
+
+    <!-- Right: detail panel (40%) -->
+    <vertical spacing='2' preferred-width='36' pad='4'
+              bg='round-rect-panel' bg-color='#1A1A1A'>
+
+      <text text='~detailTitle'    font-size='3.8' bold='true'  overflow-mode='Ellipsis' rich-text='false' align='Center'/>
+      <text text='~detailUploader' font-size='2.8' color='#AAA' overflow-mode='Ellipsis' rich-text='false' align='Center'/>
+      <text text='~detailDuration' font-size='2.8' color='#AAA' align='Center'/>
+      <text text='~detailDiffs'    font-size='2.6' color='#FF6B35' align='Center'/>
+
+      <button text='⬇ Download'
+              on-click='onDownloadClicked'
+              preferred-width='30' preferred-height='10'
+              font-size='3.5'/>
+    </vertical>
+
+  </horizontal>
+</bg>

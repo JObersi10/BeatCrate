@@ -1,0 +1,88 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up NDK
+        uses: nttld/setup-ndk@v1
+        id: setup-ndk
+        with:
+          ndk-version: r26d
+          add-to-path: true
+
+      - name: Install QPM
+        run: |
+          wget -q https://github.com/QuestPackageManager/QPM.CLI/releases/latest/download/qpm-linux -O /usr/local/bin/qpm
+          chmod +x /usr/local/bin/qpm
+
+      - name: QPM restore
+        run: qpm restore
+
+      - name: Read version from qpm.json
+        id: meta
+        run: |
+          VERSION=$(jq -r '.version' qpm.json)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Configure CMake
+        run: |
+          cmake -B build \
+            -DCMAKE_TOOLCHAIN_FILE=${{ steps.setup-ndk.outputs.ndk-path }}/build/cmake/android.toolchain.cmake \
+            -DANDROID_ABI=arm64-v8a \
+            -DANDROID_PLATFORM=android-26 \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DDEFINED_BS_QUEST=ON
+
+      - name: Build
+        run: cmake --build build --parallel $(nproc)
+
+      - name: Package .qmod
+        run: |
+          VERSION=${{ steps.meta.outputs.version }}
+          QMOD="BeatCrate-v${VERSION}.qmod"
+
+          # Fill in mod.template.json → mod.json
+          sed "s/\"version\": \".*\"/\"version\": \"${VERSION}\"/" mod.template.json > mod.json
+
+          # Collect files for the qmod zip
+          mkdir -p package
+          cp build/libapple-music-search.so package/
+          cp mod.json package/
+          [ -f assets/cover.png ] && cp assets/cover.png package/
+
+          cd package && zip -r "../${QMOD}" . && cd ..
+
+          echo "QMOD_PATH=${QMOD}" >> $GITHUB_ENV
+          echo "QMOD_NAME=${QMOD}" >> $GITHUB_ENV
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BeatCrate-qmod
+          path: ${{ env.QMOD_PATH }}
+          retention-days: 30
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.QMOD_PATH }}
+          generate_release_notes: true
+          name: BeatCrate ${{ steps.meta.outputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

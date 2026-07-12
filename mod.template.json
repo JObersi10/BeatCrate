@@ -1,0 +1,23 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nicoco007/QuestPackageManager-Rust/main/resources/schemas/mod.schema.json",
+  "version": "1.0.0",
+  "id": "apple-music-search",
+  "name": "Apple Music Search",
+  "author": "jobersi10",
+  "description": "Browse your Apple Music library and search for matching Beat Saber custom maps.",
+  "packageVersion": "1.40.8_7379",
+  "packageId": "com.beatgames.beatsaber",
+  "modloader": "Scotland2",
+  "coverImage": "cover.png",
+  "loadAfter": [],
+  "dependencies": [],
+  "lateModFiles": [
+    {
+      "id": "apple-music-search",
+      "fileName": "libapple-music-search.so"
+    }
+  ],
+  "modFiles": [],
+  "libraryFiles": [],
+  "fileCopies": []
+}

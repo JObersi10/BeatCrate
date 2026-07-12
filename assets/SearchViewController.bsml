@@ -1,0 +1,27 @@
+<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xsi:noNamespaceSchemaLocation='https://monkeymanboy.github.io/BSML-Docs/BSMLSchema.xsd'>
+
+  <vertical spacing='2' vertical-fit='PreferredSize'>
+
+    <horizontal spacing='2'>
+      <string-setting text='Search Apple Music'
+                      value='searchQuery'
+                      apply-on-change='false'
+                      preferred-width='70'
+                      hover-hint='Search your Apple Music catalog'/>
+      <button text='Search' on-click='onSearchSubmitted' preferred-width='18' preferred-height='8' font-size='3.2'/>
+      <button text='✕'      on-click='onClearClicked'   preferred-width='10' preferred-height='8' font-size='3.2'/>
+    </horizontal>
+
+    <loading-indicator active='~isLoading' preserve-aspect='true'/>
+    <text text='~statusText' font-size='3' color='#AAAAAA' align='Center'/>
+
+    <list id='resultList'
+          list-style='Simple'
+          cell-size='10'
+          select-cell='onResultCellSelected'
+          visible-cells='7'
+          preferred-width='90'/>
+
+  </vertical>
+</bg>

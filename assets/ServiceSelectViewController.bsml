@@ -1,0 +1,44 @@
+<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xsi:noNamespaceSchemaLocation='https://monkeymanboy.github.io/BSML-Docs/BSMLSchema.xsd'>
+
+  <vertical spacing='4' vertical-fit='PreferredSize' child-align='MiddleCenter'
+            pad-top='8' pad-bottom='8'>
+
+    <!-- Header -->
+    <text text='Music Search' font-size='5.5' bold='true' align='Center'/>
+    <text text='Choose a service' font-size='3' color='#AAAAAA' align='Center'/>
+
+    <vertical spacing='2' pad-top='4'>
+
+      <!-- Apple Music button -->
+      <button text='🎵  Apple Music'
+              on-click='onAppleMusicClicked'
+              preferred-width='60' preferred-height='12'
+              font-size='4'/>
+
+      <!-- Spotify — grayed out, Coming Soon -->
+      <vertical>
+        <button text='🎧  Spotify'
+                on-click='onSpotifyClicked'
+                interactable='true'
+                preferred-width='60' preferred-height='12'
+                font-size='4' color='#666666'/>
+        <text text='Coming Soon' font-size='2.5' color='#FF6B35' align='Center'
+              pad-top='-2'/>
+      </vertical>
+
+    </vertical>
+
+    <!-- Server address field -->
+    <vertical pad-top='8' spacing='1'>
+      <text text='Server Address' font-size='3' color='#AAAAAA' align='Center'/>
+      <string-setting text='Server IP:Port'
+                      value='serverAddress'
+                      apply-on-change='true'
+                      on-change='onServerAddressSet'
+                      preferred-width='70'
+                      hover-hint='Your Apple Music server, e.g. 192.168.1.100:8080'/>
+    </vertical>
+
+  </vertical>
+</bg>

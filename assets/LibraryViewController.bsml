@@ -1,0 +1,29 @@
+<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xsi:noNamespaceSchemaLocation='https://monkeymanboy.github.io/BSML-Docs/BSMLSchema.xsd'>
+
+  <vertical spacing='0' vertical-fit='PreferredSize'>
+
+    <!-- Tabs -->
+    <horizontal spacing='1' pad-bottom='2'>
+      <button text='Songs'     on-click='onSongsTabClicked'     preferred-width='28' preferred-height='8' font-size='3.2'/>
+      <button text='Albums'    on-click='onAlbumsTabClicked'    preferred-width='28' preferred-height='8' font-size='3.2'/>
+      <button text='Playlists' on-click='onPlaylistsTabClicked' preferred-width='28' preferred-height='8' font-size='3.2'/>
+      <button text='↺'         on-click='onRefreshClicked'      preferred-width='10' preferred-height='8' font-size='3.2'
+              hover-hint='Refresh library from server'/>
+    </horizontal>
+
+    <!-- Loading / status -->
+    <loading-indicator active='~isLoading' preserve-aspect='true'/>
+    <text text='~statusText' font-size='3' color='#AAAAAA' align='Center'
+          active='~isLoading' word-wrapping='false'/>
+
+    <!-- Song list (shown when tab=Songs) -->
+    <list id='songList'
+          list-style='Simple'
+          cell-size='10'
+          select-cell='onSongCellSelected'
+          visible-cells='7'
+          preferred-width='90'/>
+
+  </vertical>
+</bg>

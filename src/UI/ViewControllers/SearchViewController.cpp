@@ -1,0 +1,72 @@
+#include "UI/ViewControllers/SearchViewController.hpp"
+#include "UI/FlowCoordinators/AppleMusicFlowCoordinator.hpp"
+#include "AppleMusic/AppleMusicClient.hpp"
+#include "Log.hpp"
+#include "assets.hpp"
+
+#include "bsml/shared/BSML-Lite.hpp"
+#include "bsml/shared/BSML/Components/CustomListTableData.hpp"
+
+DEFINE_TYPE(AppleMusicSearch::UI, SearchViewController);
+
+namespace AppleMusicSearch::UI {
+
+void SearchViewController::DidActivate(bool firstActivation, bool, bool) {
+    if (!firstActivation) return;
+    BSML::parse_and_construct(IncludedAssets::SearchViewController_bsml,
+                              get_transform(), this);
+}
+
+void SearchViewController::onSearchSubmitted() {
+    std::string term = static_cast<std::string>(get_searchQuery());
+    if (term.empty()) return;
+
+    set_isLoading(true);
+    set_statusText("Searching…");
+    _results.clear();
+
+    AppleMusicClient::instance().search(term, [this](std::vector<AMSong> songs, std::string err) {
+        set_isLoading(false);
+        if (!err.empty()) { set_statusText("Error: " + err); return; }
+        if (songs.empty()) { set_statusText("No results."); return; }
+
+        _results = std::move(songs);
+        set_statusText("");
+
+        auto* list = BSML::Helpers::GetComponentInChildren<BSML::CustomListTableData*>(
+                         get_gameObject(), "resultList");
+        if (!list) return;
+        list->data.clear();
+        for (auto& s : _results)
+            list->data.push_back(BSML::CustomCellInfo::construct(
+                StringW(s.title), StringW(s.artist), nullptr));
+        list->tableView->ReloadData();
+    });
+}
+
+void SearchViewController::onClearClicked() {
+    set_searchQuery("");
+    _results.clear();
+    set_statusText("");
+    auto* list = BSML::Helpers::GetComponentInChildren<BSML::CustomListTableData*>(
+                     get_gameObject(), "resultList");
+    if (list) { list->data.clear(); list->tableView->ReloadData(); }
+}
+
+void SearchViewController::onResultCellSelected(int index) {
+    if (index < 0 || index >= (int)_results.size()) return;
+    auto& s = _results[index];
+    auto fc = BSML::Helpers::GetMainFlowCoordinator()
+                  ->YoungestChildFlowCoordinatorOrSelf()
+                  ->TryCast<AppleMusicFlowCoordinator>();
+    if (fc) fc->showBeatSaverResults(s.title, s.artist);
+}
+
+StringW SearchViewController::get_searchQuery()          { return StringW(_searchQuery); }
+void    SearchViewController::set_searchQuery(StringW v) { _searchQuery = static_cast<std::string>(v); }
+bool    SearchViewController::get_isLoading()            { return _isLoading; }
+void    SearchViewController::set_isLoading(bool v)      { _isLoading = v; }
+StringW SearchViewController::get_statusText()           { return StringW(_statusText); }
+void    SearchViewController::set_statusText(StringW v)  { _statusText = static_cast<std::string>(v); }
+
+}
