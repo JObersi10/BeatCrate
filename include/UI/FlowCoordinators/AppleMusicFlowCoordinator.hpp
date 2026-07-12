@@ -3,16 +3,13 @@
 #include "HMUI/FlowCoordinator.hpp"
 #include "HMUI/ViewController.hpp"
 #include "AppleMusic/Models.hpp"
+// Full includes needed — DECLARE_INSTANCE_FIELD requires complete types
+#include "UI/ViewControllers/ServiceSelectViewController.hpp"
+#include "UI/ViewControllers/LibraryViewController.hpp"
+#include "UI/ViewControllers/SearchViewController.hpp"
+#include "UI/ViewControllers/PlaylistTracksViewController.hpp"
+#include "UI/ViewControllers/BeatSaverResultsViewController.hpp"
 #include <string>
-
-// Forward declarations of child VCs
-namespace AppleMusicSearch::UI::ViewControllers {
-    class ServiceSelectViewController;
-    class LibraryViewController;
-    class SearchViewController;
-    class PlaylistTracksViewController;
-    class BeatSaverResultsViewController;
-}
 
 DECLARE_CLASS_CODEGEN(AppleMusicSearch::UI::FlowCoordinators, AppleMusicFlowCoordinator, HMUI::FlowCoordinator) {
     DECLARE_OVERRIDE_METHOD_MATCH(void, DidActivate, &HMUI::FlowCoordinator::DidActivate,

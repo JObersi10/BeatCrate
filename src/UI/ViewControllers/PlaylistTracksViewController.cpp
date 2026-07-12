@@ -4,7 +4,8 @@
 #include "Log.hpp"
 #include "assets.hpp"
 
-#include "bsml/shared/BSML-Lite.hpp"
+#include "bsml/shared/BSML.hpp"
+#include "bsml/shared/Helpers/getters.hpp"
 #include "bsml/shared/BSML/Components/CustomListTableData.hpp"
 
 DEFINE_TYPE(AppleMusicSearch::UI::ViewControllers, PlaylistTracksViewController);
@@ -27,39 +28,31 @@ void PlaylistTracksViewController::loadPlaylist(const AMPlaylist& playlist) {
         playlist.id,
         [this](std::vector<AMSong> tracks, std::string err) {
             set_isLoading(false);
-            if (!err.empty()) {
-                set_statusText("Error: " + err);
-                return;
-            }
+            if (!err.empty()) { set_statusText("Error: " + err); return; }
             _tracks = std::move(tracks);
             set_statusText("");
-
-            auto* list = BSML::Helpers::GetComponentInChildren<BSML::CustomListTableData*>(
-                             get_gameObject(), "trackList");
+            auto* list = get_gameObject()->GetComponentInChildren<BSML::CustomListTableData*>(false);
             if (!list) return;
             list->data.clear();
-            for (auto& s : _tracks) {
-                list->data.push_back(BSML::CustomCellInfo::construct(
-                    StringW(s.title), StringW(s.artist), nullptr));
-            }
+            for (auto& s : _tracks)
+                list->data.push_back(BSML::CustomCellInfo::construct(StringW(s.title), StringW(s.artist), nullptr));
             list->tableView->ReloadData();
         });
+}
+
+static auto getFC() {
+    return BSML::Helpers::GetMainFlowCoordinator()
+               ->YoungestChildFlowCoordinatorOrSelf()
+               ->TryCast<FlowCoordinators::AppleMusicFlowCoordinator>();
 }
 
 void PlaylistTracksViewController::onTrackCellSelected(int index) {
     if (index < 0 || index >= (int)_tracks.size()) return;
     auto& s = _tracks[index];
-    auto fc = BSML::Helpers::GetMainFlowCoordinator()
-                  ->YoungestChildFlowCoordinatorOrSelf()
-                  ->TryCast<AppleMusicFlowCoordinator>();
-    if (fc) fc->showBeatSaverResults(s.title, s.artist);
+    if (auto fc = getFC()) fc->showBeatSaverResults(s.title, s.artist);
 }
-
 void PlaylistTracksViewController::onBackClicked() {
-    auto fc = BSML::Helpers::GetMainFlowCoordinator()
-                  ->YoungestChildFlowCoordinatorOrSelf()
-                  ->TryCast<AppleMusicFlowCoordinator>();
-    if (fc) fc->popToAppleMusicHome();
+    if (auto fc = getFC()) fc->popToAppleMusicHome();
 }
 
 bool    PlaylistTracksViewController::get_isLoading()            { return _isLoading; }

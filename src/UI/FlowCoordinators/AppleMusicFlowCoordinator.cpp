@@ -6,7 +6,7 @@
 #include "UI/ViewControllers/BeatSaverResultsViewController.hpp"
 #include "Log.hpp"
 
-#include "bsml/shared/BSML-Lite.hpp"
+#include "bsml/shared/BSML.hpp"
 #include "bsml/shared/Helpers/creation.hpp"
 #include "bsml/shared/Helpers/getters.hpp"
 
