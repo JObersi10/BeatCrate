@@ -15,24 +15,18 @@ DEFINE_TYPE(AppleMusicSearch::UI::FlowCoordinators, AppleMusicFlowCoordinator);
 namespace AppleMusicSearch::UI::FlowCoordinators {
 
 using namespace AppleMusicSearch::UI::ViewControllers;
-using AT = HMUI::ViewController::AnimationType;
-using AD = HMUI::ViewController::AnimationDirection;
-
-#define REPLACE(vc, type, dir) \
-    ReplaceTopViewController(vc, nullptr, AT::type, AD::dir)
+using AT = HMUI::ViewController_AnimationType;
+using AD = HMUI::ViewController_AnimationDirection;
 
 void AppleMusicFlowCoordinator::DidActivate(bool firstActivation, bool, bool) {
     if (!firstActivation) return;
-
     SetTitle("Music Search", AT::In);
     showBackButton = true;
-
     _serviceSelect  = BSML::Helpers::CreateViewController<ServiceSelectViewController*>();
     _library        = BSML::Helpers::CreateViewController<LibraryViewController*>();
     _search         = BSML::Helpers::CreateViewController<SearchViewController*>();
     _playlistTracks = BSML::Helpers::CreateViewController<PlaylistTracksViewController*>();
     _bsResults      = BSML::Helpers::CreateViewController<BeatSaverResultsViewController*>();
-
     ProvideInitialViewControllers(_serviceSelect, nullptr, nullptr, nullptr, nullptr);
 }
 
@@ -42,26 +36,25 @@ void AppleMusicFlowCoordinator::BackButtonWasPressed(HMUI::ViewController*) {
 
 void AppleMusicFlowCoordinator::showAppleMusicHome() {
     SetTitle("Apple Music", AT::In);
-    REPLACE(_library, In, Vertical);
+    ReplaceTopViewController(_library, nullptr, AT::In, AD::Vertical);
 }
 
 void AppleMusicFlowCoordinator::showPlaylistTracks(const AMPlaylist& playlist) {
     _playlistTracks->loadPlaylist(playlist);
-    REPLACE(_playlistTracks, In, Horizontal);
+    ReplaceTopViewController(_playlistTracks, nullptr, AT::In, AD::Horizontal);
 }
 
-void AppleMusicFlowCoordinator::showBeatSaverResults(const std::string& title,
-                                                      const std::string& artist) {
+void AppleMusicFlowCoordinator::showBeatSaverResults(const std::string& title, const std::string& artist) {
     _bsResults->searchFor(title, artist);
-    REPLACE(_bsResults, In, Horizontal);
+    ReplaceTopViewController(_bsResults, nullptr, AT::In, AD::Horizontal);
 }
 
 void AppleMusicFlowCoordinator::popToAppleMusicHome() {
-    REPLACE(_library, Out, Horizontal);
+    ReplaceTopViewController(_library, nullptr, AT::Out, AD::Horizontal);
 }
 
 void AppleMusicFlowCoordinator::popToPreviousView() {
-    REPLACE(_library, Out, Horizontal);
+    ReplaceTopViewController(_library, nullptr, AT::Out, AD::Horizontal);
 }
 
 void AppleMusicFlowCoordinator::reset() {
