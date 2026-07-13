@@ -1,7 +1,4 @@
 #include "UI/ViewControllers/MainViewController.hpp"
-#include "UI/TableViewDataSources/AMPlaylistTableViewDataSource.hpp"
-#include "UI/TableViewDataSources/AMTrackTableViewDataSource.hpp"
-#include "UI/TableViewDataSources/BSMapTableViewDataSource.hpp"
 #include "AppleMusic/AppleMusicClient.hpp"
 #include "BeatSaver/BeatSaverClient.hpp"
 #include "Log.hpp"
@@ -39,23 +36,23 @@ void MainViewController::PostParse() {
 
     UnityEngine::GameObject* go = get_gameObject();
 
-    auto* playlistDS = go->GetComponent<AMPlaylistTableViewDataSource*>();
-    if (!playlistDS) playlistDS = go->AddComponent<AMPlaylistTableViewDataSource*>();
-    if (playlistListView_)
+    _playlistDS = go->GetComponent<AMPlaylistTableViewDataSource*>();
+    if (!_playlistDS) _playlistDS = go->AddComponent<AMPlaylistTableViewDataSource*>();
+    if (playlistListView_ && playlistListView_->tableView)
         playlistListView_->tableView->SetDataSource(
-            reinterpret_cast<HMUI::TableView::IDataSource*>(playlistDS), true);
+            reinterpret_cast<HMUI::TableView::IDataSource*>(_playlistDS.ptr()), true);
 
-    auto* trackDS = go->GetComponent<AMTrackTableViewDataSource*>();
-    if (!trackDS) trackDS = go->AddComponent<AMTrackTableViewDataSource*>();
-    if (trackListView_)
+    _trackDS = go->GetComponent<AMTrackTableViewDataSource*>();
+    if (!_trackDS) _trackDS = go->AddComponent<AMTrackTableViewDataSource*>();
+    if (trackListView_ && trackListView_->tableView)
         trackListView_->tableView->SetDataSource(
-            reinterpret_cast<HMUI::TableView::IDataSource*>(trackDS), true);
+            reinterpret_cast<HMUI::TableView::IDataSource*>(_trackDS.ptr()), true);
 
-    auto* mapDS = go->GetComponent<BSMapTableViewDataSource*>();
-    if (!mapDS) mapDS = go->AddComponent<BSMapTableViewDataSource*>();
-    if (mapListView_)
+    _mapDS = go->GetComponent<BSMapTableViewDataSource*>();
+    if (!_mapDS) _mapDS = go->AddComponent<BSMapTableViewDataSource*>();
+    if (mapListView_ && mapListView_->tableView)
         mapListView_->tableView->SetDataSource(
-            reinterpret_cast<HMUI::TableView::IDataSource*>(mapDS), true);
+            reinterpret_cast<HMUI::TableView::IDataSource*>(_mapDS.ptr()), true);
 
     showLeftPlaylists();
     if (leftColumnTitleTextView_) leftColumnTitleTextView_->set_text("Apple Music");
@@ -169,10 +166,10 @@ void MainViewController::loadPlaylists() {
             if (!err.empty()) { showLeftError(err); return; }
             if (playlists.empty()) { showLeftStatus("No playlists found.\nCheck MUT in Mod Settings."); return; }
             _playlists = std::move(playlists);
-            auto* ds = get_gameObject()->GetComponent<AMPlaylistTableViewDataSource*>();
-            if (ds) {
-                ds->playlists_ = _playlists;
-                if (playlistListView_) playlistListView_->tableView->ReloadData();
+            if (_playlistDS) {
+                _playlistDS->playlists_ = _playlists;
+                if (playlistListView_ && playlistListView_->tableView)
+                    playlistListView_->tableView->ReloadData();
             }
         });
 }
@@ -186,10 +183,10 @@ void MainViewController::loadTracksForPlaylist(const std::string& playlistId, co
             if (!err.empty()) { showLeftError(err); return; }
             if (tracks.empty()) { showLeftStatus("No tracks in this playlist."); return; }
             _tracks = std::move(tracks);
-            auto* ds = get_gameObject()->GetComponent<AMTrackTableViewDataSource*>();
-            if (ds) {
-                ds->tracks_ = _tracks;
-                if (trackListView_) trackListView_->tableView->ReloadData();
+            if (_trackDS) {
+                _trackDS->tracks_ = _tracks;
+                if (trackListView_ && trackListView_->tableView)
+                    trackListView_->tableView->ReloadData();
             }
             showLeftTracks();
         });
@@ -206,10 +203,10 @@ void MainViewController::searchBeatSaver(const std::string& title, const std::st
             if (!err.empty()) { showMapStatus("Error: " + err); return; }
             if (maps.empty())  { showMapStatus("No maps found on BeatSaver."); return; }
             _maps = std::move(maps);
-            auto* ds = get_gameObject()->GetComponent<BSMapTableViewDataSource*>();
-            if (ds) {
-                ds->maps_ = _maps;
-                if (mapListView_) mapListView_->tableView->ReloadData();
+            if (_mapDS) {
+                _mapDS->maps_ = _maps;
+                if (mapListView_ && mapListView_->tableView)
+                    mapListView_->tableView->ReloadData();
             }
             showMapList();
         });
@@ -232,12 +229,10 @@ void MainViewController::onTrackSelected(int index) {
 void MainViewController::onBackToPlaylistsClicked() {
     if (leftColumnTitleTextView_) leftColumnTitleTextView_->set_text("Apple Music");
     _tracks.clear();
-    auto* ds = get_gameObject()->GetComponent<AMTrackTableViewDataSource*>();
-    if (ds) { ds->tracks_.clear(); if (trackListView_) trackListView_->tableView->ReloadData(); }
+    if (_trackDS) { _trackDS->tracks_.clear(); if (trackListView_ && trackListView_->tableView) trackListView_->tableView->ReloadData(); }
     showLeftPlaylists();
     _maps.clear();
-    auto* mapDS = get_gameObject()->GetComponent<BSMapTableViewDataSource*>();
-    if (mapDS) { mapDS->maps_.clear(); if (mapListView_) mapListView_->tableView->ReloadData(); }
+    if (_mapDS) { _mapDS->maps_.clear(); if (mapListView_ && mapListView_->tableView) mapListView_->tableView->ReloadData(); }
     showMapStatus("");
     clearMapPreview();
 }

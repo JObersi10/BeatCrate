@@ -9,6 +9,10 @@
 #include "bsml/shared/BSML/Components/CustomListTableData.hpp"
 #include "AppleMusic/Models.hpp"
 #include "BeatSaver/BeatSaverClient.hpp"
+#include "UI/TableViewDataSources/AMPlaylistTableViewDataSource.hpp"
+#include "UI/TableViewDataSources/AMTrackTableViewDataSource.hpp"
+#include "UI/TableViewDataSources/BSMapTableViewDataSource.hpp"
+#include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 #include <vector>
 #include <string>
 #include <atomic>
@@ -58,6 +62,10 @@ private:
     std::vector<AppleMusicSearch::AMPlaylist> _playlists;
     std::vector<AppleMusicSearch::AMSong>     _tracks;
     std::vector<AppleMusicSearch::BSMap>      _maps;
+
+    SafePtrUnity<AMPlaylistTableViewDataSource> _playlistDS;
+    SafePtrUnity<AMTrackTableViewDataSource>    _trackDS;
+    SafePtrUnity<BSMapTableViewDataSource>      _mapDS;
 
     int  _selectedMapIndex = -1;
     bool _showingTracks    = false;
