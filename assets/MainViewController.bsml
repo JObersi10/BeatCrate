@@ -6,20 +6,20 @@
 
         <!-- Header: back button + title -->
         <horizontal pivot-y="1" child-expand-width="false" pref-height="6" pad-right="4">
-            <icon-button pad="0" id="backToPlaylistsButton_" icon="#HorizontalArrowIcon" on-click="onBackToPlaylistsClicked" pref-width="8" pref-height="6" pivot-x="0" pad-right="1"/>
+            <icon-button active="false" pad="0" id="backToPlaylistsButton_" icon="#HorizontalArrowIcon" on-click="onBackToPlaylistsClicked" pref-width="8" pref-height="6" pivot-x="0" pad-right="1"/>
             <text id="leftColumnTitleTextView_" align="MidlineLeft" font-align="MidlineLeft" word-wrapping="false" font-size="3.5" overflow-mode="Ellipsis"/>
         </horizontal>
 
         <vertical flex-height="100" horizontal-fit="Unconstrained" pad-top="1">
 
             <vertical ignore-layout="true" horizontal-fit="Unconstrained">
-                <horizontal id="leftLoadingContainer_" ignore-layout="true">
+                <horizontal active="false" id="leftLoadingContainer_" ignore-layout="true">
                     <loading preserve-aspect="true" pref-height="8"/>
                 </horizontal>
-                <vertical id="leftErrorContainer_" ignore-layout="true" pad-right="8">
+                <vertical active="false" id="leftErrorContainer_" ignore-layout="true" pad-right="8">
                     <text id="leftErrorTextView_" font-size="3" color="red" align="Center"/>
                 </vertical>
-                <vertical id="leftStatusContainer_" ignore-layout="true">
+                <vertical active="false" id="leftStatusContainer_" ignore-layout="true">
                     <text id="leftStatusTextView_" font-size="3" align="Center"/>
                 </vertical>
             </vertical>
@@ -42,10 +42,10 @@
         <vertical flex-height="100" horizontal-fit="Unconstrained">
 
             <vertical ignore-layout="true" horizontal-fit="Unconstrained">
-                <horizontal id="mapLoadingContainer_" ignore-layout="true">
+                <horizontal active="false" id="mapLoadingContainer_" ignore-layout="true">
                     <loading preserve-aspect="true" pref-height="8"/>
                 </horizontal>
-                <vertical id="mapStatusContainer_" ignore-layout="true">
+                <vertical active="false" id="mapStatusContainer_" ignore-layout="true">
                     <text id="mapStatusTextView_" font-size="3" align="Center"/>
                 </vertical>
             </vertical>
@@ -76,7 +76,7 @@
         <vertical vertical-fit="Unconstrained" flex-height="100"/>
         <vertical pad="2">
             <text id="downloadStatusTextView_" font-size="2.5" align="Center" color='#AAA'/>
-            <primary-button id="downloadButton_" text="Download" on-click="onDownloadClicked"/>
+            <primary-button active="false" id="downloadButton_" text="Download" on-click="onDownloadClicked"/>
         </vertical>
     </vertical>
 

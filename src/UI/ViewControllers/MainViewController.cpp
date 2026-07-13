@@ -26,18 +26,17 @@ void MainViewController::DidActivate(bool firstActivation, bool, bool) {
 }
 
 void MainViewController::PostParse() {
-    // Hide back-to-playlists button initially (we start on the playlist view)
-    backToPlaylistsButton_->get_gameObject()->set_active(false);
-
-    // Hide all overlays initially
-    leftLoadingContainer_->get_gameObject()->set_active(false);
-    leftErrorContainer_->get_gameObject()->set_active(false);
-    leftStatusContainer_->get_gameObject()->set_active(false);
-    mapLoadingContainer_->get_gameObject()->set_active(false);
-    mapStatusContainer_->get_gameObject()->set_active(false);
-    mapListView_->get_gameObject()->set_active(false);
-    downloadButton_->get_gameObject()->set_active(false);
-    downloadStatusTextView_->set_text("");
+    // BSML already sets active="false" on overlays/buttons in the BSML file.
+    // These calls are belt-and-suspenders; guard against null in case a binding failed.
+    if (backToPlaylistsButton_) backToPlaylistsButton_->get_gameObject()->set_active(false);
+    if (leftLoadingContainer_)  leftLoadingContainer_->get_gameObject()->set_active(false);
+    if (leftErrorContainer_)    leftErrorContainer_->get_gameObject()->set_active(false);
+    if (leftStatusContainer_)   leftStatusContainer_->get_gameObject()->set_active(false);
+    if (mapLoadingContainer_)   mapLoadingContainer_->get_gameObject()->set_active(false);
+    if (mapStatusContainer_)    mapStatusContainer_->get_gameObject()->set_active(false);
+    if (mapListView_)           mapListView_->get_gameObject()->set_active(false);
+    if (downloadButton_)        downloadButton_->get_gameObject()->set_active(false);
+    if (downloadStatusTextView_) downloadStatusTextView_->set_text("");
 
     clearMapPreview();
 
@@ -136,12 +135,12 @@ void MainViewController::showMapStatus(const std::string& msg) {
 // ─── Right panel helpers ──────────────────────────────────────────────────────
 
 void MainViewController::clearMapPreview() {
-    previewMapNameTextView_->set_text("Select a map");
-    previewUploaderTextView_->set_text("");
-    previewDurationTextView_->set_text("");
-    previewDiffsTextView_->set_text("");
-    downloadButton_->get_gameObject()->set_active(false);
-    downloadStatusTextView_->set_text("");
+    if (previewMapNameTextView_)  previewMapNameTextView_->set_text("Select a map");
+    if (previewUploaderTextView_) previewUploaderTextView_->set_text("");
+    if (previewDurationTextView_) previewDurationTextView_->set_text("");
+    if (previewDiffsTextView_)    previewDiffsTextView_->set_text("");
+    if (downloadButton_)          downloadButton_->get_gameObject()->set_active(false);
+    if (downloadStatusTextView_)  downloadStatusTextView_->set_text("");
 }
 
 void MainViewController::showMapPreview(const AppleMusicSearch::BSMap& map) {
