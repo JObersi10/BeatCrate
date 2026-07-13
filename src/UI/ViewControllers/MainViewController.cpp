@@ -10,7 +10,6 @@
 #include "bsml/shared/BSML.hpp"
 #include "bsml/shared/BSML/MainThreadScheduler.hpp"
 #include "UnityEngine/GameObject.hpp"
-#include "HMUI/Touchable.hpp"
 
 DEFINE_TYPE(AppleMusicSearch::UI::ViewControllers, MainViewController);
 
@@ -26,9 +25,6 @@ void MainViewController::DidActivate(bool firstActivation, bool, bool) {
 
     // BSML C++ does not auto-call PostParse on the host — do all init here after parse.
     BSML::parse_and_construct(IncludedAssets::MainViewController_bsml, get_transform(), this);
-
-    // Ensure controller raycasts hit this VC.
-    get_gameObject()->AddComponent<HMUI::Touchable*>();
 
     // Belt-and-suspenders: BSML sets active="false" in the markup, but guard nulls.
     if (backToPlaylistsButton_) backToPlaylistsButton_->get_gameObject()->set_active(false);

@@ -11,4 +11,6 @@ DECLARE_CLASS_CODEGEN(AppleMusicSearch::UI::FlowCoordinators, AppleMusicFlowCoor
         HMUI::ViewController* topViewController);
 
     DECLARE_INSTANCE_FIELD(UnityW<AppleMusicSearch::UI::ViewControllers::MainViewController>, _mainVC);
+    DECLARE_INSTANCE_FIELD(UnityW<HMUI::ViewController>, _leftVC);
+    DECLARE_INSTANCE_FIELD(UnityW<HMUI::ViewController>, _rightVC);
 };

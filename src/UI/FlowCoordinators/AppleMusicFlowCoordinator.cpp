@@ -13,8 +13,12 @@ void AppleMusicFlowCoordinator::DidActivate(bool firstActivation, bool, bool) {
     if (!firstActivation) return;
     SetTitle("BeatCrate", AT::In);
     showBackButton = true;
-    _mainVC = BSML::Helpers::CreateViewController<ViewControllers::MainViewController*>();
-    ProvideInitialViewControllers(_mainVC, nullptr, nullptr, nullptr, nullptr);
+    _mainVC  = BSML::Helpers::CreateViewController<ViewControllers::MainViewController*>();
+    // Pass blank VCs for left/right slots so Beat Saber replaces the main menu's sidebar panels.
+    // Passing nullptr leaves the main menu's sidebars visible (overlay bug).
+    _leftVC  = BSML::Helpers::CreateViewController<HMUI::ViewController*>();
+    _rightVC = BSML::Helpers::CreateViewController<HMUI::ViewController*>();
+    ProvideInitialViewControllers(_mainVC, _leftVC, _rightVC, nullptr, nullptr);
 }
 
 void AppleMusicFlowCoordinator::BackButtonWasPressed(HMUI::ViewController*) {

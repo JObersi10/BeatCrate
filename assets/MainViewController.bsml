@@ -1,8 +1,9 @@
-<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-    xsi:noNamespaceSchemaLocation='https://raw.githubusercontent.com/RedBrumbler/Quest-BSML-Docs/gh-pages/schema.xsd'>
+<horizontal xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xsi:noNamespaceSchemaLocation='https://raw.githubusercontent.com/RedBrumbler/Quest-BSML-Docs/gh-pages/schema.xsd'
+    horizontal-fit="Unconstrained" vertical-fit="Unconstrained">
 
     <!-- [Left 26%] Apple Music playlists and tracks -->
-    <vertical horizontal-fit="Unconstrained" anchor-max-x="0.260">
+    <vertical ignore-layout="true" horizontal-fit="Unconstrained" anchor-max-x="0.260">
 
         <!-- Header: back button + title -->
         <horizontal pivot-y="1" child-expand-width="false" pref-height="6" pad-right="4">
@@ -12,6 +13,7 @@
 
         <vertical flex-height="100" horizontal-fit="Unconstrained" pad-top="1">
 
+            <!-- Overlays: all start hidden -->
             <vertical ignore-layout="true" horizontal-fit="Unconstrained">
                 <horizontal active="false" id="leftLoadingContainer_" ignore-layout="true">
                     <loading preserve-aspect="true" pref-height="8"/>
@@ -33,7 +35,7 @@
     </vertical>
 
     <!-- [Center 48%] BeatSaver search results -->
-    <vertical horizontal-fit="Unconstrained" anchor-min-x="0.260" anchor-max-x="0.740">
+    <vertical ignore-layout="true" horizontal-fit="Unconstrained" anchor-min-x="0.260" anchor-max-x="0.740">
 
         <horizontal pref-height="6" pivot-y="1">
             <text font-size="3.5" text='Search Results' align="MidlineLeft"/>
@@ -41,6 +43,7 @@
 
         <vertical flex-height="100" horizontal-fit="Unconstrained">
 
+            <!-- Overlays: all start hidden -->
             <vertical ignore-layout="true" horizontal-fit="Unconstrained">
                 <horizontal active="false" id="mapLoadingContainer_" ignore-layout="true">
                     <loading preserve-aspect="true" pref-height="8"/>
@@ -58,7 +61,7 @@
     </vertical>
 
     <!-- [Right 26%] Map preview + download -->
-    <vertical horizontal-fit="Unconstrained" anchor-min-x="0.740" anchor-max-x="1" background="round-rect-panel">
+    <vertical ignore-layout="true" horizontal-fit="Unconstrained" anchor-min-x="0.740" anchor-max-x="1" background="round-rect-panel">
         <vertical vertical-fit="PreferredSize" pad-bottom="1" pref-width="40">
             <text id="previewMapNameTextView_" align="Center" word-wrapping="false" overflow-mode="Ellipsis"/>
             <text id="previewUploaderTextView_" font-size="3" align="Center" word-wrapping="false" overflow-mode="Ellipsis" color='#AAA'/>
@@ -80,4 +83,4 @@
         </vertical>
     </vertical>
 
-</bg>
+</horizontal>
