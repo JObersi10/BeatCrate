@@ -18,8 +18,6 @@ DECLARE_CLASS_CODEGEN(AppleMusicSearch::UI::ViewControllers, MainViewController,
     DECLARE_OVERRIDE_METHOD_MATCH(void, DidActivate, &HMUI::ViewController::DidActivate,
         bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
 
-    DECLARE_INSTANCE_METHOD(void, PostParse);
-
     // Left panel
     DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::Button>,              backToPlaylistsButton_);
     DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*,                      leftColumnTitleTextView_);

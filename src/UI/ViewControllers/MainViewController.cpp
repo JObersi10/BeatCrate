@@ -10,6 +10,7 @@
 #include "bsml/shared/BSML.hpp"
 #include "bsml/shared/BSML/MainThreadScheduler.hpp"
 #include "UnityEngine/GameObject.hpp"
+#include "HMUI/Touchable.hpp"
 
 DEFINE_TYPE(AppleMusicSearch::UI::ViewControllers, MainViewController);
 
@@ -22,12 +23,14 @@ void MainViewController::ctor() {
 
 void MainViewController::DidActivate(bool firstActivation, bool, bool) {
     if (!firstActivation) return;
-    BSML::parse_and_construct(IncludedAssets::MainViewController_bsml, get_transform(), this);
-}
 
-void MainViewController::PostParse() {
-    // BSML already sets active="false" on overlays/buttons in the BSML file.
-    // These calls are belt-and-suspenders; guard against null in case a binding failed.
+    // BSML C++ does not auto-call PostParse on the host — do all init here after parse.
+    BSML::parse_and_construct(IncludedAssets::MainViewController_bsml, get_transform(), this);
+
+    // Ensure controller raycasts hit this VC.
+    get_gameObject()->AddComponent<HMUI::Touchable*>();
+
+    // Belt-and-suspenders: BSML sets active="false" in the markup, but guard nulls.
     if (backToPlaylistsButton_) backToPlaylistsButton_->get_gameObject()->set_active(false);
     if (leftLoadingContainer_)  leftLoadingContainer_->get_gameObject()->set_active(false);
     if (leftErrorContainer_)    leftErrorContainer_->get_gameObject()->set_active(false);
@@ -40,33 +43,27 @@ void MainViewController::PostParse() {
 
     clearMapPreview();
 
-    // Set up playlist data source
+    // Set up data sources.
     auto* playlistDS = get_gameObject()->GetComponent<AMPlaylistTableViewDataSource*>();
-    if (!playlistDS) {
-        playlistDS = get_gameObject()->AddComponent<AMPlaylistTableViewDataSource*>();
-    }
-    playlistListView_->tableView->SetDataSource(
-        reinterpret_cast<HMUI::TableView::IDataSource*>(playlistDS), true);
+    if (!playlistDS) playlistDS = get_gameObject()->AddComponent<AMPlaylistTableViewDataSource*>();
+    if (playlistListView_)
+        playlistListView_->tableView->SetDataSource(
+            reinterpret_cast<HMUI::TableView::IDataSource*>(playlistDS), true);
 
-    // Set up track data source
     auto* trackDS = get_gameObject()->GetComponent<AMTrackTableViewDataSource*>();
-    if (!trackDS) {
-        trackDS = get_gameObject()->AddComponent<AMTrackTableViewDataSource*>();
-    }
-    trackListView_->tableView->SetDataSource(
-        reinterpret_cast<HMUI::TableView::IDataSource*>(trackDS), true);
+    if (!trackDS) trackDS = get_gameObject()->AddComponent<AMTrackTableViewDataSource*>();
+    if (trackListView_)
+        trackListView_->tableView->SetDataSource(
+            reinterpret_cast<HMUI::TableView::IDataSource*>(trackDS), true);
 
-    // Set up map data source
     auto* mapDS = get_gameObject()->GetComponent<BSMapTableViewDataSource*>();
-    if (!mapDS) {
-        mapDS = get_gameObject()->AddComponent<BSMapTableViewDataSource*>();
-    }
-    mapListView_->tableView->SetDataSource(
-        reinterpret_cast<HMUI::TableView::IDataSource*>(mapDS), true);
+    if (!mapDS) mapDS = get_gameObject()->AddComponent<BSMapTableViewDataSource*>();
+    if (mapListView_)
+        mapListView_->tableView->SetDataSource(
+            reinterpret_cast<HMUI::TableView::IDataSource*>(mapDS), true);
 
-    // Show playlist view and load playlists
     showLeftPlaylists();
-    leftColumnTitleTextView_->set_text("Apple Music");
+    if (leftColumnTitleTextView_) leftColumnTitleTextView_->set_text("Apple Music");
     loadPlaylists();
 }
 
