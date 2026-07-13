@@ -1,0 +1,83 @@
+<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xsi:noNamespaceSchemaLocation='https://raw.githubusercontent.com/RedBrumbler/Quest-BSML-Docs/gh-pages/schema.xsd'>
+
+    <!-- [Left 26%] Apple Music playlists and tracks -->
+    <vertical horizontal-fit="Unconstrained" anchor-max-x="0.260">
+
+        <!-- Header: back button + title -->
+        <horizontal pivot-y="1" child-expand-width="false" pref-height="6" pad-right="4">
+            <icon-button pad="0" id="backToPlaylistsButton_" icon="#HorizontalArrowIcon" on-click="onBackToPlaylistsClicked" pref-width="8" pref-height="6" pivot-x="0" pad-right="1"/>
+            <text id="leftColumnTitleTextView_" align="MidlineLeft" font-align="MidlineLeft" word-wrapping="false" font-size="3.5" overflow-mode="Ellipsis"/>
+        </horizontal>
+
+        <vertical flex-height="100" horizontal-fit="Unconstrained" pad-top="1">
+
+            <vertical ignore-layout="true" horizontal-fit="Unconstrained">
+                <horizontal id="leftLoadingContainer_" ignore-layout="true">
+                    <loading preserve-aspect="true" pref-height="8"/>
+                </horizontal>
+                <vertical id="leftErrorContainer_" ignore-layout="true" pad-right="8">
+                    <text id="leftErrorTextView_" font-size="3" color="red" align="Center"/>
+                </vertical>
+                <vertical id="leftStatusContainer_" ignore-layout="true">
+                    <text id="leftStatusTextView_" font-size="3" align="Center"/>
+                </vertical>
+            </vertical>
+
+            <vertical horizontal-fit="Unconstrained" pad-right="8" flex-width="0" flex-height="0">
+                <list active="true"  id='playlistListView_' select-cell='onPlaylistSelected' show-scrollbar='true' stick-scrolling="true" list-width="12"/>
+                <list active="false" id='trackListView_'    select-cell='onTrackSelected'    show-scrollbar='true' stick-scrolling="true" list-width="12"/>
+            </vertical>
+
+        </vertical>
+    </vertical>
+
+    <!-- [Center 48%] BeatSaver search results -->
+    <vertical horizontal-fit="Unconstrained" anchor-min-x="0.260" anchor-max-x="0.740">
+
+        <horizontal pref-height="6" pivot-y="1">
+            <text font-size="3.5" text='Search Results' align="MidlineLeft"/>
+        </horizontal>
+
+        <vertical flex-height="100" horizontal-fit="Unconstrained">
+
+            <vertical ignore-layout="true" horizontal-fit="Unconstrained">
+                <horizontal id="mapLoadingContainer_" ignore-layout="true">
+                    <loading preserve-aspect="true" pref-height="8"/>
+                </horizontal>
+                <vertical id="mapStatusContainer_" ignore-layout="true">
+                    <text id="mapStatusTextView_" font-size="3" align="Center"/>
+                </vertical>
+            </vertical>
+
+            <vertical horizontal-fit="Unconstrained" pad-right="8" flex-width="0" flex-height="0" ignore-layout="true">
+                <list active="false" id='mapListView_' select-cell='onMapSelected' show-scrollbar='true' stick-scrolling="true" list-width="30"/>
+            </vertical>
+
+        </vertical>
+    </vertical>
+
+    <!-- [Right 26%] Map preview + download -->
+    <vertical horizontal-fit="Unconstrained" anchor-min-x="0.740" anchor-max-x="1" background="round-rect-panel">
+        <vertical vertical-fit="PreferredSize" pad-bottom="1" pref-width="40">
+            <text id="previewMapNameTextView_" align="Center" word-wrapping="false" overflow-mode="Ellipsis"/>
+            <text id="previewUploaderTextView_" font-size="3" align="Center" word-wrapping="false" overflow-mode="Ellipsis" color='#AAA'/>
+        </vertical>
+        <horizontal child-expand-width="true" pad-top="2">
+            <vertical pref-width="20">
+                <text font-size="3" color='#AAA' text="Duration" font-align="Right" overflow-mode="Truncate" word-wrapping="false"/>
+                <text font-size="3" color='#AAA' text="Diffs"    font-align="Right" overflow-mode="Truncate" word-wrapping="false"/>
+            </vertical>
+            <vertical pref-width="20">
+                <text font-size="3" id="previewDurationTextView_" overflow-mode="Truncate" word-wrapping="false"/>
+                <text font-size="3" id="previewDiffsTextView_"    overflow-mode="Truncate" word-wrapping="false"/>
+            </vertical>
+        </horizontal>
+        <vertical vertical-fit="Unconstrained" flex-height="100"/>
+        <vertical pad="2">
+            <text id="downloadStatusTextView_" font-size="2.5" align="Center" color='#AAA'/>
+            <primary-button id="downloadButton_" text="Download" on-click="onDownloadClicked"/>
+        </vertical>
+    </vertical>
+
+</bg>
