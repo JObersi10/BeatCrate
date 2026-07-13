@@ -37,7 +37,7 @@ void MainViewController::PostParse() {
     if (downloadStatusTextView_) downloadStatusTextView_->set_text("");
     clearMapPreview();
 
-    auto* go = get_gameObject();
+    UnityEngine::GameObject* go = get_gameObject();
 
     auto* playlistDS = go->GetComponent<AMPlaylistTableViewDataSource*>();
     if (!playlistDS) playlistDS = go->AddComponent<AMPlaylistTableViewDataSource*>();
