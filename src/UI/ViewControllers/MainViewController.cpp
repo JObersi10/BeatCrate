@@ -6,7 +6,6 @@
 #include "BeatSaver/BeatSaverClient.hpp"
 #include "Log.hpp"
 #include "assets.hpp"
-
 #include "bsml/shared/BSML.hpp"
 #include "bsml/shared/BSML/MainThreadScheduler.hpp"
 #include "UnityEngine/GameObject.hpp"
@@ -16,17 +15,17 @@ DEFINE_TYPE(AppleMusicSearch::UI::ViewControllers, MainViewController);
 namespace AppleMusicSearch::UI::ViewControllers {
 
 void MainViewController::ctor() {
+    INVOKE_BASE_CTOR(classof(HMUI::ViewController*));
     _selectedMapIndex = -1;
     _showingTracks    = false;
 }
 
 void MainViewController::DidActivate(bool firstActivation, bool, bool) {
     if (!firstActivation) return;
-
-    // BSML C++ does not auto-call PostParse on the host — do all init here after parse.
     BSML::parse_and_construct(IncludedAssets::MainViewController_bsml, get_transform(), this);
+}
 
-    // Belt-and-suspenders: BSML sets active="false" in the markup, but guard nulls.
+void MainViewController::PostParse() {
     if (backToPlaylistsButton_) backToPlaylistsButton_->get_gameObject()->set_active(false);
     if (leftLoadingContainer_)  leftLoadingContainer_->get_gameObject()->set_active(false);
     if (leftErrorContainer_)    leftErrorContainer_->get_gameObject()->set_active(false);
@@ -36,24 +35,24 @@ void MainViewController::DidActivate(bool firstActivation, bool, bool) {
     if (mapListView_)           mapListView_->get_gameObject()->set_active(false);
     if (downloadButton_)        downloadButton_->get_gameObject()->set_active(false);
     if (downloadStatusTextView_) downloadStatusTextView_->set_text("");
-
     clearMapPreview();
 
-    // Set up data sources.
-    auto* playlistDS = get_gameObject()->GetComponent<AMPlaylistTableViewDataSource*>();
-    if (!playlistDS) playlistDS = get_gameObject()->AddComponent<AMPlaylistTableViewDataSource*>();
+    auto* go = get_gameObject();
+
+    auto* playlistDS = go->GetComponent<AMPlaylistTableViewDataSource*>();
+    if (!playlistDS) playlistDS = go->AddComponent<AMPlaylistTableViewDataSource*>();
     if (playlistListView_)
         playlistListView_->tableView->SetDataSource(
             reinterpret_cast<HMUI::TableView::IDataSource*>(playlistDS), true);
 
-    auto* trackDS = get_gameObject()->GetComponent<AMTrackTableViewDataSource*>();
-    if (!trackDS) trackDS = get_gameObject()->AddComponent<AMTrackTableViewDataSource*>();
+    auto* trackDS = go->GetComponent<AMTrackTableViewDataSource*>();
+    if (!trackDS) trackDS = go->AddComponent<AMTrackTableViewDataSource*>();
     if (trackListView_)
         trackListView_->tableView->SetDataSource(
             reinterpret_cast<HMUI::TableView::IDataSource*>(trackDS), true);
 
-    auto* mapDS = get_gameObject()->GetComponent<BSMapTableViewDataSource*>();
-    if (!mapDS) mapDS = get_gameObject()->AddComponent<BSMapTableViewDataSource*>();
+    auto* mapDS = go->GetComponent<BSMapTableViewDataSource*>();
+    if (!mapDS) mapDS = go->AddComponent<BSMapTableViewDataSource*>();
     if (mapListView_)
         mapListView_->tableView->SetDataSource(
             reinterpret_cast<HMUI::TableView::IDataSource*>(mapDS), true);
@@ -63,69 +62,69 @@ void MainViewController::DidActivate(bool firstActivation, bool, bool) {
     loadPlaylists();
 }
 
-// ─── Left panel helpers ───────────────────────────────────────────────────────
+// ── Left panel ────────────────────────────────────────────────────────────────
 
 void MainViewController::showLeftLoading() {
-    leftLoadingContainer_->get_gameObject()->set_active(true);
-    leftErrorContainer_->get_gameObject()->set_active(false);
-    leftStatusContainer_->get_gameObject()->set_active(false);
+    if (leftLoadingContainer_) leftLoadingContainer_->get_gameObject()->set_active(true);
+    if (leftErrorContainer_)   leftErrorContainer_->get_gameObject()->set_active(false);
+    if (leftStatusContainer_)  leftStatusContainer_->get_gameObject()->set_active(false);
 }
 
 void MainViewController::showLeftPlaylists() {
     _showingTracks = false;
-    backToPlaylistsButton_->get_gameObject()->set_active(false);
-    playlistListView_->get_gameObject()->set_active(true);
-    trackListView_->get_gameObject()->set_active(false);
-    leftErrorContainer_->get_gameObject()->set_active(false);
-    leftStatusContainer_->get_gameObject()->set_active(false);
+    if (backToPlaylistsButton_) backToPlaylistsButton_->get_gameObject()->set_active(false);
+    if (playlistListView_)      playlistListView_->get_gameObject()->set_active(true);
+    if (trackListView_)         trackListView_->get_gameObject()->set_active(false);
+    if (leftErrorContainer_)    leftErrorContainer_->get_gameObject()->set_active(false);
+    if (leftStatusContainer_)   leftStatusContainer_->get_gameObject()->set_active(false);
 }
 
 void MainViewController::showLeftTracks() {
     _showingTracks = true;
-    backToPlaylistsButton_->get_gameObject()->set_active(true);
-    trackListView_->get_gameObject()->set_active(true);
-    playlistListView_->get_gameObject()->set_active(false);
-    leftErrorContainer_->get_gameObject()->set_active(false);
-    leftStatusContainer_->get_gameObject()->set_active(false);
-    leftLoadingContainer_->get_gameObject()->set_active(false);
+    if (backToPlaylistsButton_) backToPlaylistsButton_->get_gameObject()->set_active(true);
+    if (trackListView_)         trackListView_->get_gameObject()->set_active(true);
+    if (playlistListView_)      playlistListView_->get_gameObject()->set_active(false);
+    if (leftErrorContainer_)    leftErrorContainer_->get_gameObject()->set_active(false);
+    if (leftStatusContainer_)   leftStatusContainer_->get_gameObject()->set_active(false);
+    if (leftLoadingContainer_)  leftLoadingContainer_->get_gameObject()->set_active(false);
 }
 
 void MainViewController::showLeftError(const std::string& msg) {
-    leftLoadingContainer_->get_gameObject()->set_active(false);
-    leftErrorContainer_->get_gameObject()->set_active(true);
-    leftErrorTextView_->set_text(msg);
-    leftStatusContainer_->get_gameObject()->set_active(false);
+    if (leftLoadingContainer_) leftLoadingContainer_->get_gameObject()->set_active(false);
+    if (leftErrorContainer_)   leftErrorContainer_->get_gameObject()->set_active(true);
+    if (leftErrorTextView_)    leftErrorTextView_->set_text(msg);
+    if (leftStatusContainer_)  leftStatusContainer_->get_gameObject()->set_active(false);
 }
 
 void MainViewController::showLeftStatus(const std::string& msg) {
-    leftLoadingContainer_->get_gameObject()->set_active(false);
-    leftErrorContainer_->get_gameObject()->set_active(false);
-    leftStatusContainer_->get_gameObject()->set_active(true);
-    leftStatusTextView_->set_text(msg);
+    if (leftLoadingContainer_)  leftLoadingContainer_->get_gameObject()->set_active(false);
+    if (leftErrorContainer_)    leftErrorContainer_->get_gameObject()->set_active(false);
+    if (leftStatusContainer_)   leftStatusContainer_->get_gameObject()->set_active(true);
+    if (leftStatusTextView_)    leftStatusTextView_->set_text(msg);
 }
 
-// ─── Center panel helpers ─────────────────────────────────────────────────────
+// ── Center panel ──────────────────────────────────────────────────────────────
 
 void MainViewController::showMapLoading() {
-    mapLoadingContainer_->get_gameObject()->set_active(true);
-    mapStatusContainer_->get_gameObject()->set_active(false);
-    mapListView_->get_gameObject()->set_active(false);
+    if (mapLoadingContainer_) mapLoadingContainer_->get_gameObject()->set_active(true);
+    if (mapStatusContainer_)  mapStatusContainer_->get_gameObject()->set_active(false);
+    if (mapListView_)         mapListView_->get_gameObject()->set_active(false);
 }
 
 void MainViewController::showMapList() {
-    mapLoadingContainer_->get_gameObject()->set_active(false);
-    mapStatusContainer_->get_gameObject()->set_active(false);
-    mapListView_->get_gameObject()->set_active(true);
+    if (mapLoadingContainer_) mapLoadingContainer_->get_gameObject()->set_active(false);
+    if (mapStatusContainer_)  mapStatusContainer_->get_gameObject()->set_active(false);
+    if (mapListView_)         mapListView_->get_gameObject()->set_active(true);
 }
 
 void MainViewController::showMapStatus(const std::string& msg) {
-    mapLoadingContainer_->get_gameObject()->set_active(false);
-    mapStatusContainer_->get_gameObject()->set_active(true);
-    mapStatusTextView_->set_text(msg);
-    mapListView_->get_gameObject()->set_active(false);
+    if (mapLoadingContainer_) mapLoadingContainer_->get_gameObject()->set_active(false);
+    if (mapStatusContainer_)  mapStatusContainer_->get_gameObject()->set_active(true);
+    if (mapStatusTextView_)   mapStatusTextView_->set_text(msg);
+    if (mapListView_)         mapListView_->get_gameObject()->set_active(false);
 }
 
-// ─── Right panel helpers ──────────────────────────────────────────────────────
+// ── Right panel ───────────────────────────────────────────────────────────────
 
 void MainViewController::clearMapPreview() {
     if (previewMapNameTextView_)  previewMapNameTextView_->set_text("Select a map");
@@ -137,113 +136,86 @@ void MainViewController::clearMapPreview() {
 }
 
 void MainViewController::showMapPreview(const AppleMusicSearch::BSMap& map) {
-    previewMapNameTextView_->set_text(map.name);
-    previewUploaderTextView_->set_text("by " + map.uploaderName);
-
-    if (map.durationSecs > 0) {
-        int m = map.durationSecs / 60, s = map.durationSecs % 60;
-        char buf[16]; snprintf(buf, sizeof(buf), "%d:%02d", m, s);
-        previewDurationTextView_->set_text(buf);
-    } else {
-        previewDurationTextView_->set_text("");
+    if (previewMapNameTextView_)  previewMapNameTextView_->set_text(map.name);
+    if (previewUploaderTextView_) previewUploaderTextView_->set_text("by " + map.uploaderName);
+    if (previewDurationTextView_) {
+        if (map.durationSecs > 0) {
+            char buf[16];
+            snprintf(buf, sizeof(buf), "%d:%02d", map.durationSecs / 60, map.durationSecs % 60);
+            previewDurationTextView_->set_text(buf);
+        } else {
+            previewDurationTextView_->set_text("");
+        }
     }
-
-    std::string diffs;
-    for (size_t i = 0; i < map.difficulties.size(); ++i) {
-        if (i) diffs += "  ";
-        diffs += map.difficulties[i];
+    if (previewDiffsTextView_) {
+        std::string diffs;
+        for (size_t i = 0; i < map.difficulties.size(); ++i) {
+            if (i) diffs += "  ";
+            diffs += map.difficulties[i];
+        }
+        previewDiffsTextView_->set_text(diffs);
     }
-    previewDiffsTextView_->set_text(diffs);
-
-    downloadStatusTextView_->set_text("");
-    downloadButton_->get_gameObject()->set_active(true);
+    if (downloadStatusTextView_) downloadStatusTextView_->set_text("");
+    if (downloadButton_)         downloadButton_->get_gameObject()->set_active(true);
 }
 
-// ─── Load playlists ───────────────────────────────────────────────────────────
+// ── API calls ─────────────────────────────────────────────────────────────────
 
 void MainViewController::loadPlaylists() {
     showLeftLoading();
     AppleMusicClient::instance().fetchLibraryPlaylists(
         [this](std::vector<AMPlaylist> playlists, std::string err) {
-            leftLoadingContainer_->get_gameObject()->set_active(false);
-            if (!err.empty()) {
-                showLeftError(err);
-                return;
-            }
-            if (playlists.empty()) {
-                showLeftStatus("No playlists found.\nCheck MUT in Mod Settings.");
-                return;
-            }
+            if (leftLoadingContainer_) leftLoadingContainer_->get_gameObject()->set_active(false);
+            if (!err.empty()) { showLeftError(err); return; }
+            if (playlists.empty()) { showLeftStatus("No playlists found.\nCheck MUT in Mod Settings."); return; }
             _playlists = std::move(playlists);
-
             auto* ds = get_gameObject()->GetComponent<AMPlaylistTableViewDataSource*>();
             if (ds) {
                 ds->playlists_ = _playlists;
-                playlistListView_->tableView->ReloadData();
+                if (playlistListView_) playlistListView_->tableView->ReloadData();
             }
         });
 }
 
-// ─── Load tracks for selected playlist ───────────────────────────────────────
-
-void MainViewController::loadTracksForPlaylist(const std::string& playlistId,
-                                                const std::string& playlistName) {
+void MainViewController::loadTracksForPlaylist(const std::string& playlistId, const std::string& playlistName) {
     showLeftLoading();
-    leftColumnTitleTextView_->set_text(playlistName);
-
+    if (leftColumnTitleTextView_) leftColumnTitleTextView_->set_text(playlistName);
     AppleMusicClient::instance().fetchPlaylistTracks(
         playlistId,
         [this](std::vector<AMSong> tracks, std::string err) {
-            if (!err.empty()) {
-                showLeftError(err);
-                return;
-            }
-            if (tracks.empty()) {
-                showLeftStatus("No tracks in this playlist.");
-                return;
-            }
+            if (!err.empty()) { showLeftError(err); return; }
+            if (tracks.empty()) { showLeftStatus("No tracks in this playlist."); return; }
             _tracks = std::move(tracks);
-
             auto* ds = get_gameObject()->GetComponent<AMTrackTableViewDataSource*>();
             if (ds) {
                 ds->tracks_ = _tracks;
-                trackListView_->tableView->ReloadData();
+                if (trackListView_) trackListView_->tableView->ReloadData();
             }
             showLeftTracks();
         });
 }
-
-// ─── BeatSaver search ─────────────────────────────────────────────────────────
 
 void MainViewController::searchBeatSaver(const std::string& title, const std::string& artist) {
     _selectedMapIndex = -1;
     _maps.clear();
     clearMapPreview();
     showMapLoading();
-
     BeatSaverClient::instance().search(
         title, artist,
         [this](std::vector<BSMap> maps, std::string err) {
-            if (!err.empty()) {
-                showMapStatus("Error: " + err);
-                return;
-            }
-            if (maps.empty()) {
-                showMapStatus("No maps found on BeatSaver.");
-                return;
-            }
+            if (!err.empty()) { showMapStatus("Error: " + err); return; }
+            if (maps.empty())  { showMapStatus("No maps found on BeatSaver."); return; }
             _maps = std::move(maps);
-
             auto* ds = get_gameObject()->GetComponent<BSMapTableViewDataSource*>();
             if (ds) {
                 ds->maps_ = _maps;
-                mapListView_->tableView->ReloadData();
+                if (mapListView_) mapListView_->tableView->ReloadData();
             }
             showMapList();
         });
 }
 
-// ─── Callbacks ────────────────────────────────────────────────────────────────
+// ── Callbacks ─────────────────────────────────────────────────────────────────
 
 void MainViewController::onPlaylistSelected(int index) {
     if (index < 0 || index >= (int)_playlists.size()) return;
@@ -258,15 +230,14 @@ void MainViewController::onTrackSelected(int index) {
 }
 
 void MainViewController::onBackToPlaylistsClicked() {
-    leftColumnTitleTextView_->set_text("Apple Music");
+    if (leftColumnTitleTextView_) leftColumnTitleTextView_->set_text("Apple Music");
     _tracks.clear();
     auto* ds = get_gameObject()->GetComponent<AMTrackTableViewDataSource*>();
-    if (ds) { ds->tracks_.clear(); trackListView_->tableView->ReloadData(); }
+    if (ds) { ds->tracks_.clear(); if (trackListView_) trackListView_->tableView->ReloadData(); }
     showLeftPlaylists();
-    // Clear center and right panels
     _maps.clear();
     auto* mapDS = get_gameObject()->GetComponent<BSMapTableViewDataSource*>();
-    if (mapDS) { mapDS->maps_.clear(); mapListView_->tableView->ReloadData(); }
+    if (mapDS) { mapDS->maps_.clear(); if (mapListView_) mapListView_->tableView->ReloadData(); }
     showMapStatus("");
     clearMapPreview();
 }
@@ -281,16 +252,15 @@ void MainViewController::onDownloadClicked() {
     if (_selectedMapIndex < 0 || _selectedMapIndex >= (int)_maps.size()) return;
     if (_isDownloading.load()) return;
     _isDownloading = true;
-    downloadButton_->get_gameObject()->set_active(false);
-    downloadStatusTextView_->set_text("Downloading…");
-
+    if (downloadButton_)        downloadButton_->get_gameObject()->set_active(false);
+    if (downloadStatusTextView_) downloadStatusTextView_->set_text("Downloading...");
     auto map = _maps[_selectedMapIndex];
     BeatSaverClient::instance().downloadMap(
         map,
         [this](bool ok, std::string err) {
             _isDownloading = false;
-            downloadButton_->get_gameObject()->set_active(true);
-            downloadStatusTextView_->set_text(ok ? "Downloaded!" : "Failed: " + err);
+            if (downloadButton_)        downloadButton_->get_gameObject()->set_active(true);
+            if (downloadStatusTextView_) downloadStatusTextView_->set_text(ok ? "Downloaded!" : "Failed: " + err);
         });
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "custom-types/shared/macros.hpp"
 #include "HMUI/ViewController.hpp"
+#include "HMUI/TableView.hpp"
 #include "TMPro/TextMeshProUGUI.hpp"
 #include "UnityEngine/UI/Button.hpp"
 #include "UnityEngine/UI/HorizontalLayoutGroup.hpp"
@@ -18,14 +19,16 @@ DECLARE_CLASS_CODEGEN(AppleMusicSearch::UI::ViewControllers, MainViewController,
     DECLARE_OVERRIDE_METHOD_MATCH(void, DidActivate, &HMUI::ViewController::DidActivate,
         bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
 
+    DECLARE_INSTANCE_METHOD(void, PostParse);
+
     // Left panel
     DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::Button>,              backToPlaylistsButton_);
-    DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*,                      leftColumnTitleTextView_);
+    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>,               leftColumnTitleTextView_);
     DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::HorizontalLayoutGroup>, leftLoadingContainer_);
     DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::VerticalLayoutGroup>,   leftErrorContainer_);
-    DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*,                      leftErrorTextView_);
+    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>,               leftErrorTextView_);
     DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::VerticalLayoutGroup>,   leftStatusContainer_);
-    DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*,                      leftStatusTextView_);
+    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>,               leftStatusTextView_);
     DECLARE_INSTANCE_FIELD(UnityW<BSML::CustomListTableData>,            playlistListView_);
     DECLARE_INSTANCE_FIELD(UnityW<BSML::CustomListTableData>,            trackListView_);
 
@@ -36,17 +39,17 @@ DECLARE_CLASS_CODEGEN(AppleMusicSearch::UI::ViewControllers, MainViewController,
     // Center panel
     DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::HorizontalLayoutGroup>, mapLoadingContainer_);
     DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::VerticalLayoutGroup>,   mapStatusContainer_);
-    DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*,                      mapStatusTextView_);
+    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>,               mapStatusTextView_);
     DECLARE_INSTANCE_FIELD(UnityW<BSML::CustomListTableData>,            mapListView_);
 
     DECLARE_INSTANCE_METHOD(void, onMapSelected, int index);
 
     // Right panel
-    DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, previewMapNameTextView_);
-    DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, previewUploaderTextView_);
-    DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, previewDurationTextView_);
-    DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, previewDiffsTextView_);
-    DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, downloadStatusTextView_);
+    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, previewMapNameTextView_);
+    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, previewUploaderTextView_);
+    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, previewDurationTextView_);
+    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, previewDiffsTextView_);
+    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, downloadStatusTextView_);
     DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::Button>, downloadButton_);
 
     DECLARE_INSTANCE_METHOD(void, onDownloadClicked);
@@ -56,8 +59,8 @@ private:
     std::vector<AppleMusicSearch::AMSong>     _tracks;
     std::vector<AppleMusicSearch::BSMap>      _maps;
 
-    int  _selectedMapIndex   = -1;
-    bool _showingTracks      = false;
+    int  _selectedMapIndex = -1;
+    bool _showingTracks    = false;
     std::atomic<bool> _isDownloading{false};
 
     void loadPlaylists();
