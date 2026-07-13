@@ -29,7 +29,8 @@ void AppleMusicFlowCoordinator::DidActivate(bool firstActivation, bool, bool) {
 }
 
 void AppleMusicFlowCoordinator::BackButtonWasPressed(HMUI::ViewController*) {
-    _parentFlowCoordinator->DismissFlowCoordinator(this, AD::Vertical, nullptr, false);
+    auto* mainFC = BSML::Helpers::GetMainFlowCoordinator();
+    if (mainFC) mainFC->DismissFlowCoordinator(this, AD::Vertical, nullptr, false);
 }
 
 void AppleMusicFlowCoordinator::showPlaylistTracks(const AMPlaylist& playlist) {
@@ -51,7 +52,8 @@ void AppleMusicFlowCoordinator::popToPreviousView() {
 }
 
 void AppleMusicFlowCoordinator::reset() {
-    _parentFlowCoordinator->DismissFlowCoordinator(this, AD::Vertical, nullptr, false);
+    auto* mainFC = BSML::Helpers::GetMainFlowCoordinator();
+    if (mainFC) mainFC->DismissFlowCoordinator(this, AD::Vertical, nullptr, false);
 }
 
 }

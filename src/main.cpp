@@ -17,8 +17,8 @@ using namespace AppleMusicSearch::UI;
 static void openBeatCrate() {
     static SafePtrUnity<FlowCoordinators::AppleMusicFlowCoordinator> fc;
     if (!fc) fc = BSML::Helpers::CreateFlowCoordinator<FlowCoordinators::AppleMusicFlowCoordinator*>();
-    auto parent = BSML::Helpers::GetMainFlowCoordinator()->YoungestChildFlowCoordinatorOrSelf();
-    if (parent) parent->PresentFlowCoordinator(fc.ptr(), nullptr, HMUI::ViewController_AnimationDirection::Horizontal, false, false);
+    auto* mainFC = BSML::Helpers::GetMainFlowCoordinator();
+    if (mainFC) mainFC->PresentFlowCoordinator(fc.ptr(), nullptr, HMUI::ViewController_AnimationDirection::Vertical, false, false);
 }
 
 MOD_EXTERN_FUNC void setup(CModInfo* info) noexcept {
