@@ -22,9 +22,15 @@ void ServiceSelectViewController::DidActivate(bool firstActivation, bool, bool) 
         jwtStatusText_->set_text(StringW(jwt.empty() ? "Not set" : "Set (" + std::to_string(jwt.size()) + " chars)"));
 }
 
+static std::string trimStr(std::string s) {
+    s.erase(0, s.find_first_not_of(" \t\r\n"));
+    s.erase(s.find_last_not_of(" \t\r\n") + 1);
+    return s;
+}
+
 void ServiceSelectViewController::onPasteMut() {
     auto clip = UnityEngine::GUIUtility::get_systemCopyBuffer();
-    std::string s = static_cast<std::string>(clip);
+    std::string s = trimStr(static_cast<std::string>(clip));
     if (mutStatusText_) mutStatusText_->set_text(StringW(s.empty() ? "Clipboard empty" : "Set (" + std::to_string(s.size()) + " chars)"));
     if (s.empty()) return;
     setMut(s);
@@ -41,9 +47,8 @@ void ServiceSelectViewController::onMutChanged() {
 
 void ServiceSelectViewController::onPasteJwt() {
     auto clip = UnityEngine::GUIUtility::get_systemCopyBuffer();
-    std::string s = static_cast<std::string>(clip);
-    // Strip "Bearer " prefix if user copied the full header value
-    if (s.rfind("Bearer ", 0) == 0) s = s.substr(7);
+    std::string s = trimStr(static_cast<std::string>(clip));
+    if (s.rfind("Bearer ", 0) == 0) s = trimStr(s.substr(7));
     if (jwtStatusText_) jwtStatusText_->set_text(StringW(s.empty() ? "Clipboard empty" : "Set (" + std::to_string(s.size()) + " chars)"));
     if (s.empty()) return;
     setCachedJwt(s);

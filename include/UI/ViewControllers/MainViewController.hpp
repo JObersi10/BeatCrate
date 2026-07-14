@@ -43,7 +43,7 @@ DECLARE_CLASS_CODEGEN(AppleMusicSearch::UI::ViewControllers, MainViewController,
     DECLARE_INSTANCE_FIELD(UnityW<BSML::CustomListTableData>,             trackListView_);
 
     // Search section input container
-    DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::VerticalLayoutGroup>,  searchContainer_);
+    DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::HorizontalLayoutGroup>, searchContainer_);
     DECLARE_INSTANCE_METHOD(void, onSearchQueryChanged);
 
     DECLARE_INSTANCE_METHOD(void, onPlaylistSelected, UnityW<HMUI::TableView> table, int index);
