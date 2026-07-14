@@ -10,6 +10,7 @@ DECLARE_CLASS_CODEGEN(AppleMusicSearch::UI::ViewControllers, ServiceSelectViewCo
     DECLARE_INSTANCE_METHOD(void, onPasteMut);
     DECLARE_INSTANCE_METHOD(void, onMutChanged);
     DECLARE_INSTANCE_METHOD(void, onPasteJwt);
+    DECLARE_INSTANCE_METHOD(void, onDebugHostChanged);
 
     DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, mutStatusText_);
     DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, jwtStatusText_);
@@ -17,4 +18,6 @@ DECLARE_CLASS_CODEGEN(AppleMusicSearch::UI::ViewControllers, ServiceSelectViewCo
 public:
     StringW get_mutToken();
     void    set_mutToken(StringW v);
+    StringW get_debugHost();
+    void    set_debugHost(StringW v);
 };

@@ -14,5 +14,7 @@ std::string getCachedJwt();
 void        setCachedJwt(const std::string& v);
 std::string getStorefront();
 void        setStorefront(const std::string& v);
+std::string getDebugHost();
+void        setDebugHost(const std::string& v);
 
 }

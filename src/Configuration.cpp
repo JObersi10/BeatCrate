@@ -28,5 +28,7 @@ std::string getCachedJwt()               { return cfgGet("jwt"); }
 void        setCachedJwt(const std::string& v) { cfgSet("jwt", v); }
 std::string getStorefront()              { return cfgGet("storefront", "us"); }
 void        setStorefront(const std::string& v){ cfgSet("storefront", v); }
+std::string getDebugHost()               { return cfgGet("debugHost"); }
+void        setDebugHost(const std::string& v) { cfgSet("debugHost", v); }
 
 }

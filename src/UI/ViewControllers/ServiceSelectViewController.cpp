@@ -55,7 +55,14 @@ void ServiceSelectViewController::onPasteJwt() {
     AMS_LOG("JWT pasted ({} chars)", s.size());
 }
 
+void ServiceSelectViewController::onDebugHostChanged() {
+    std::string h = static_cast<std::string>(get_debugHost());
+    if (!h.empty()) setDebugHost(h);
+}
+
 StringW ServiceSelectViewController::get_mutToken()          { return StringW(getMut()); }
 void    ServiceSelectViewController::set_mutToken(StringW v) { /* handled by onMutChanged */ }
+StringW ServiceSelectViewController::get_debugHost()         { return StringW(getDebugHost()); }
+void    ServiceSelectViewController::set_debugHost(StringW v){ setDebugHost(static_cast<std::string>(v)); }
 
 }

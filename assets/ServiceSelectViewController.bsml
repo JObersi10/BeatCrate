@@ -40,6 +40,19 @@
             font-size='2.3' color='#777777' align='Left' word-wrapping='true'/>
     </vertical>
 
+    <!-- Debug section -->
+    <vertical spacing='1' pad-top='4'>
+      <text text='Debug' font-size='4' bold='true' color='#888888' align='Left'/>
+      <string-setting text='PC IP for logs'
+                      value='debugHost'
+                      apply-on-change='true'
+                      on-change='onDebugHostChanged'
+                      preferred-width='80'
+                      hover-hint='Your PC LAN IP — run debug_server.py then set this'/>
+      <text text='Run debug_server.py on your PC, enter its IP above, then open BeatCrate to stream logs'
+            font-size='2.3' color='#666666' align='Left' word-wrapping='true'/>
+    </vertical>
+
     <!-- Spotify section -->
     <vertical spacing='1' pad-top='6'>
       <text text='Spotify' font-size='4' bold='true' color='#555555' align='Left'/>

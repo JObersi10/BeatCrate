@@ -145,6 +145,21 @@ static std::string fetchJwtSync() {
     return jwt;
 }
 
+static void debugPost(const std::string& msg) {
+    std::string host = AppleMusicSearch::getDebugHost();
+    if (host.empty()) return;
+    std::thread([host, msg]() {
+        std::string encoded;
+        for (unsigned char c : msg) {
+            if (std::isalnum(c) || c=='-'||c=='_'||c=='.'||c=='~'||c==' '||c==':'||c=='/'||c=='?'||c=='='||c=='&'||c==','||c=='('||c==')')
+                encoded += (c==' ') ? '+' : (char)c;
+            else { char b[4]; snprintf(b,sizeof(b),"%%%02X",c); encoded+=b; }
+        }
+        WebUtils::Get<WebUtils::StringResponse>(
+            WebUtils::URLOptions("http://" + host + ":8080/log?msg=" + encoded));
+    }).detach();
+}
+
 static std::string trimStr(const std::string& s) {
     size_t a = s.find_first_not_of(" \t\r\n");
     if (a == std::string::npos) return "";
@@ -157,9 +172,11 @@ void AppleMusicClient::withJwt(std::function<void(std::string)> cb) {
     std::string cached = trimStr(getCachedJwt());
     if (!cached.empty()) {
         _jwt = cached;
-        AMS_LOG("withJwt: using cached JWT ({} chars)", _jwt.size());
+        std::string dbg = "JWT ok len=" + std::to_string(_jwt.size()) + " head=" + _jwt.substr(0,12);
+        AMS_LOG("{}", dbg); debugPost(dbg);
         cb(_jwt); return;
     }
+    debugPost("JWT: no cached value, attempting web scrape");
 
     std::thread([this, cb = std::move(cb)]() mutable {
         std::string jwt = fetchJwtSync();
@@ -179,9 +196,10 @@ void AppleMusicClient::apiGet(const std::string& url, bool needsMut,
     std::function<void(const rapidjson::Document*, std::string)> cb) {
 
     withJwt([url, needsMut, cb = std::move(cb)](std::string jwt) {
-        if (jwt.empty()) { cb(nullptr, "Could not obtain Bearer token"); return; }
+        if (jwt.empty()) { debugPost("ERR: no JWT"); cb(nullptr, "Could not obtain Bearer token"); return; }
         std::string mut = trimStr(getMut());
         if (needsMut && mut.empty()) { cb(nullptr, "No MUT set — open Mod Settings → BeatCrate"); return; }
+        debugPost("GET " + url + " jwt_len=" + std::to_string(jwt.size()) + " mut_len=" + std::to_string(mut.size()));
 
         std::thread([url, jwt, mut, needsMut, cb = std::move(cb)]() mutable {
             WebUtils::URLOptions opts(url);
@@ -198,7 +216,8 @@ void AppleMusicClient::apiGet(const std::string& url, bool needsMut,
                 WebUtils::Get<WebUtils::JsonResponse>(opts));
             BSML::MainThreadScheduler::Schedule([resp, url, cb = std::move(cb)]() mutable {
                 if (!resp->IsSuccessful() || !resp->responseData) {
-                    AMS_ERROR("API {} -> HTTP {}", url, resp->httpCode);
+                    std::string errMsg = "HTTP " + std::to_string(resp->httpCode) + " url=" + url;
+                    AMS_ERROR("{}", errMsg); debugPost(errMsg);
                     cb(nullptr, "HTTP " + std::to_string(resp->httpCode));
                     return;
                 }
