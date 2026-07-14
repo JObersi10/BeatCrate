@@ -36,8 +36,8 @@ DECLARE_CLASS_CODEGEN(AppleMusicSearch::UI::ViewControllers, MainViewController,
     DECLARE_INSTANCE_FIELD(UnityW<BSML::CustomListTableData>,            playlistListView_);
     DECLARE_INSTANCE_FIELD(UnityW<BSML::CustomListTableData>,            trackListView_);
 
-    DECLARE_INSTANCE_METHOD(void, onPlaylistSelected, int index);
-    DECLARE_INSTANCE_METHOD(void, onTrackSelected,    int index);
+    DECLARE_INSTANCE_METHOD(void, onPlaylistSelected, UnityW<HMUI::TableView> table, int index);
+    DECLARE_INSTANCE_METHOD(void, onTrackSelected,    UnityW<HMUI::TableView> table, int index);
     DECLARE_INSTANCE_METHOD(void, onBackToPlaylistsClicked);
 
     // Center panel
@@ -46,7 +46,7 @@ DECLARE_CLASS_CODEGEN(AppleMusicSearch::UI::ViewControllers, MainViewController,
     DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>,               mapStatusTextView_);
     DECLARE_INSTANCE_FIELD(UnityW<BSML::CustomListTableData>,            mapListView_);
 
-    DECLARE_INSTANCE_METHOD(void, onMapSelected, int index);
+    DECLARE_INSTANCE_METHOD(void, onMapSelected, UnityW<HMUI::TableView> table, int index);
 
     // Right panel
     DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, previewMapNameTextView_);

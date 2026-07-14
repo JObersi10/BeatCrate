@@ -214,13 +214,13 @@ void MainViewController::searchBeatSaver(const std::string& title, const std::st
 
 // ── Callbacks ─────────────────────────────────────────────────────────────────
 
-void MainViewController::onPlaylistSelected(int index) {
+void MainViewController::onPlaylistSelected(UnityW<HMUI::TableView>, int index) {
     if (index < 0 || index >= (int)_playlists.size()) return;
     auto& pl = _playlists[index];
     loadTracksForPlaylist(pl.id, pl.name);
 }
 
-void MainViewController::onTrackSelected(int index) {
+void MainViewController::onTrackSelected(UnityW<HMUI::TableView>, int index) {
     if (index < 0 || index >= (int)_tracks.size()) return;
     auto& t = _tracks[index];
     searchBeatSaver(t.title, t.artist);
@@ -237,7 +237,7 @@ void MainViewController::onBackToPlaylistsClicked() {
     clearMapPreview();
 }
 
-void MainViewController::onMapSelected(int index) {
+void MainViewController::onMapSelected(UnityW<HMUI::TableView>, int index) {
     if (index < 0 || index >= (int)_maps.size()) return;
     _selectedMapIndex = index;
     showMapPreview(_maps[index]);

@@ -55,7 +55,7 @@ HANDOFF.md       # session-by-session progress log — read this too
 ### custom-types
 - Macro: `DECLARE_CLASS_CODEGEN(ns, Name, Base) { body };` — body is inside braces, NOT a 4th arg
 - `DECLARE_INSTANCE_FIELD` requires the field type to be **fully included**, not forward-declared
-- Cell-selected BSML bindings pass **only `int index`** — no `UnityW<HMUI::TableView>` param
+- Cell-selected BSML bindings pass **`(UnityW<HMUI::TableView> table, int index)`** — confirmed from Spotify Search mod using identical bsml 0.4.55. The 1-param form silently never fires.
 
 ### BSML
 - `BSML::parse_and_construct(asset, transform, this)` — from `bsml/shared/BSML.hpp` (NOT `BSML-Lite.hpp`)
