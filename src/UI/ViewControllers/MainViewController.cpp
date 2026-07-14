@@ -122,7 +122,15 @@ void MainViewController::onRefreshClicked() {
 }
 
 void MainViewController::onSearchQueryChanged() {
-    // Fired when user confirms text in the BSML keyboard
+    if (!_searchTerm.empty()) {
+        showLeftLoading();
+        if (trackListView_) trackListView_->get_gameObject()->set_active(false);
+        searchAppleMusic(_searchTerm);
+    }
+}
+
+void MainViewController::onSearchGoClicked() {
+    // _searchTerm is set by set_searchTerm() when keyboard confirms
     if (!_searchTerm.empty()) {
         showLeftLoading();
         if (trackListView_) trackListView_->get_gameObject()->set_active(false);

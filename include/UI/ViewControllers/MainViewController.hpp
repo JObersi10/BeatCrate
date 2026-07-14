@@ -45,6 +45,7 @@ DECLARE_CLASS_CODEGEN(AppleMusicSearch::UI::ViewControllers, MainViewController,
     // Search section input container
     DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::HorizontalLayoutGroup>, searchContainer_);
     DECLARE_INSTANCE_METHOD(void, onSearchQueryChanged);
+    DECLARE_INSTANCE_METHOD(void, onSearchGoClicked);
 
     DECLARE_INSTANCE_METHOD(void, onPlaylistSelected, UnityW<HMUI::TableView> table, int index);
     DECLARE_INSTANCE_METHOD(void, onTrackSelected,    UnityW<HMUI::TableView> table, int index);

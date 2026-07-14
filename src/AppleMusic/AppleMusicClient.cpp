@@ -145,11 +145,21 @@ static std::string fetchJwtSync() {
     return jwt;
 }
 
+static std::string trimStr(const std::string& s) {
+    size_t a = s.find_first_not_of(" \t\r\n");
+    if (a == std::string::npos) return "";
+    size_t b = s.find_last_not_of(" \t\r\n");
+    return s.substr(a, b - a + 1);
+}
+
 void AppleMusicClient::withJwt(std::function<void(std::string)> cb) {
-    // Use in-memory cache first, then config cache
     if (!_jwt.empty()) { cb(_jwt); return; }
-    std::string cached = getCachedJwt();
-    if (!cached.empty()) { _jwt = cached; cb(_jwt); return; }
+    std::string cached = trimStr(getCachedJwt());
+    if (!cached.empty()) {
+        _jwt = cached;
+        AMS_LOG("withJwt: using cached JWT ({} chars)", _jwt.size());
+        cb(_jwt); return;
+    }
 
     std::thread([this, cb = std::move(cb)]() mutable {
         std::string jwt = fetchJwtSync();
@@ -170,7 +180,7 @@ void AppleMusicClient::apiGet(const std::string& url, bool needsMut,
 
     withJwt([url, needsMut, cb = std::move(cb)](std::string jwt) {
         if (jwt.empty()) { cb(nullptr, "Could not obtain Bearer token"); return; }
-        std::string mut = getMut();
+        std::string mut = trimStr(getMut());
         if (needsMut && mut.empty()) { cb(nullptr, "No MUT set — open Mod Settings → BeatCrate"); return; }
 
         std::thread([url, jwt, mut, needsMut, cb = std::move(cb)]() mutable {
