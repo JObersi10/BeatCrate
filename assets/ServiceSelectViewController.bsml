@@ -22,7 +22,7 @@
                 on-click='onPasteMut'
                 preferred-width='50' preferred-height='9'
                 font-size='3.5'/>
-        <text text='~mutStatus' font-size='3' color='#AAAAAA' align='Left'/>
+        <text id='mutStatusText_' font-size='3' color='#AAAAAA' align='Left'/>
       </horizontal>
 
       <text text='Get MUT: open music.apple.com, F12, Network tab, any request, copy Music-User-Token header'
