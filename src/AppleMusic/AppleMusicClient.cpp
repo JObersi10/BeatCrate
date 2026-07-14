@@ -230,24 +230,13 @@ void AppleMusicClient::search(const std::string& term, SongsCallback cb) {
 }
 
 void AppleMusicClient::fetchLibrarySongs(SongsCallback cb) {
-    std::string url = BASE + "/v1/me/library/songs?limit=100&include=catalog";
+    std::string url = BASE + "/v1/me/library/songs?limit=100&l=en-US";
     apiGet(url, true, [cb](const rapidjson::Document* d, std::string err) {
         if (!d) { cb({}, err); return; }
         std::vector<AMSong> v;
         if (d->HasMember("data") && (*d)["data"].IsArray()) {
-            for (auto& item : (*d)["data"].GetArray()) {
-                // Prefer the embedded catalog item for metadata/artwork
-                if (item.HasMember("relationships") &&
-                    item["relationships"].HasMember("catalog") &&
-                    item["relationships"]["catalog"].HasMember("data") &&
-                    item["relationships"]["catalog"]["data"].IsArray() &&
-                    !item["relationships"]["catalog"]["data"].Empty()) {
-                    v.push_back(parseSong(item["relationships"]["catalog"]["data"][0]));
-                    v.back().id = js(item, "id"); // keep library ID
-                } else {
-                    v.push_back(parseSong(item));
-                }
-            }
+            for (auto& item : (*d)["data"].GetArray())
+                v.push_back(parseSong(item));
         }
         std::sort(v.begin(), v.end(), [](const AMSong& a, const AMSong& b){
             return a.title < b.title;
@@ -257,23 +246,13 @@ void AppleMusicClient::fetchLibrarySongs(SongsCallback cb) {
 }
 
 void AppleMusicClient::fetchLibraryAlbums(AlbumsCallback cb) {
-    std::string url = BASE + "/v1/me/library/albums?limit=100&include=catalog";
+    std::string url = BASE + "/v1/me/library/albums?limit=100&l=en-US";
     apiGet(url, true, [cb](const rapidjson::Document* d, std::string err) {
         if (!d) { cb({}, err); return; }
         std::vector<AMAlbum> v;
         if (d->HasMember("data") && (*d)["data"].IsArray()) {
-            for (auto& item : (*d)["data"].GetArray()) {
-                if (item.HasMember("relationships") &&
-                    item["relationships"].HasMember("catalog") &&
-                    item["relationships"]["catalog"].HasMember("data") &&
-                    item["relationships"]["catalog"]["data"].IsArray() &&
-                    !item["relationships"]["catalog"]["data"].Empty()) {
-                    v.push_back(parseAlbum(item["relationships"]["catalog"]["data"][0]));
-                    v.back().id = js(item, "id");
-                } else {
-                    v.push_back(parseAlbum(item));
-                }
-            }
+            for (auto& item : (*d)["data"].GetArray())
+                v.push_back(parseAlbum(item));
         }
         std::sort(v.begin(), v.end(), [](const AMAlbum& a, const AMAlbum& b){
             return a.title < b.title;
@@ -283,7 +262,7 @@ void AppleMusicClient::fetchLibraryAlbums(AlbumsCallback cb) {
 }
 
 void AppleMusicClient::fetchLibraryPlaylists(PlaylistsCallback cb) {
-    std::string url = BASE + "/v1/me/library/playlists?limit=100&include=catalog";
+    std::string url = BASE + "/v1/me/library/playlists?limit=100&l=en-US";
     apiGet(url, true, [cb](const rapidjson::Document* d, std::string err) {
         if (!d) { cb({}, err); return; }
         std::vector<AMPlaylist> v;
@@ -302,27 +281,17 @@ void AppleMusicClient::fetchPlaylistTracks(const std::string& id, SongsCallback 
     std::string url;
     // p. = user playlist (library), pl. = catalog/editorial
     if (id.rfind("pl.", 0) == 0)
-        url = BASE + "/v1/catalog/" + getStorefront() + "/playlists/" + id + "/tracks?limit=100";
+        url = BASE + "/v1/catalog/" + getStorefront() + "/playlists/" + id + "/tracks?limit=100&l=en-US";
     else
-        url = BASE + "/v1/me/library/playlists/" + id + "/tracks?limit=100&include=catalog";
+        url = BASE + "/v1/me/library/playlists/" + id + "/tracks?limit=100&l=en-US";
 
     bool needsMut = (id.rfind("pl.", 0) != 0); // catalog playlists don't strictly require MUT
     apiGet(url, needsMut, [cb](const rapidjson::Document* d, std::string err) {
         if (!d) { cb({}, err); return; }
         std::vector<AMSong> v;
         if (d->HasMember("data") && (*d)["data"].IsArray()) {
-            for (auto& item : (*d)["data"].GetArray()) {
-                if (item.HasMember("relationships") &&
-                    item["relationships"].HasMember("catalog") &&
-                    item["relationships"]["catalog"].HasMember("data") &&
-                    item["relationships"]["catalog"]["data"].IsArray() &&
-                    !item["relationships"]["catalog"]["data"].Empty()) {
-                    v.push_back(parseSong(item["relationships"]["catalog"]["data"][0]));
-                    v.back().id = js(item, "id");
-                } else {
-                    v.push_back(parseSong(item));
-                }
-            }
+            for (auto& item : (*d)["data"].GetArray())
+                v.push_back(parseSong(item));
         }
         cb(std::move(v), "");
     });
