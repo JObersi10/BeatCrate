@@ -5,6 +5,8 @@
 
 #include "bsml/shared/BSML.hpp"
 #include "UnityEngine/GUIUtility.hpp"
+#include "web-utils/shared/WebUtils.hpp"
+#include <thread>
 
 DEFINE_TYPE(AppleMusicSearch::UI::ViewControllers, ServiceSelectViewController);
 
@@ -57,7 +59,14 @@ void ServiceSelectViewController::onPasteJwt() {
 
 void ServiceSelectViewController::onDebugHostChanged() {
     std::string h = static_cast<std::string>(get_debugHost());
-    if (!h.empty()) setDebugHost(h);
+    h = trimStr(h);
+    if (h.empty()) return;
+    setDebugHost(h);
+    // Fire-and-forget ping so the user knows the server connection works
+    std::thread([h]() {
+        WebUtils::Get<WebUtils::StringResponse>(
+            WebUtils::URLOptions("http://" + h + ":8080/log?msg=BeatCrate+connected+from+Quest"));
+    }).detach();
 }
 
 StringW ServiceSelectViewController::get_mutToken()          { return StringW(getMut()); }

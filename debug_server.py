@@ -39,8 +39,21 @@ class Handler(BaseHTTPRequestHandler):
         pass  # silence default access log noise
 
 if __name__ == '__main__':
+    import socket
+    def get_lan_ip():
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(('8.8.8.8', 80))
+            ip = s.getsockname()[0]
+            s.close()
+            return ip
+        except Exception:
+            return '?.?.?.?'
+
     host = '0.0.0.0'
     port = 8080
+    lan_ip = get_lan_ip()
     print(f"BeatCrate debug server listening on :{port}")
-    print(f"Enter your PC's LAN IP in BeatCrate Mod Settings → Debug Host\n")
+    print(f"Your PC's IP: {lan_ip}")
+    print(f"→ Enter  {lan_ip}  in BeatCrate Mod Settings → Debug Host\n")
     HTTPServer((host, port), Handler).serve_forever()
