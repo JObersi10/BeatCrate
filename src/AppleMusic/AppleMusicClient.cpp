@@ -180,16 +180,15 @@ void AppleMusicClient::apiGet(const std::string& url, bool needsMut,
                 {"Origin",          "https://music.apple.com"},
                 {"User-Agent",      USER_AGENT},
             };
-            if (needsMut && !mut.empty()) {
+            if (needsMut && !mut.empty())
                 hdrs["Music-User-Token"] = mut;
-                hdrs["Media-User-Token"] = mut;
-            }
             opts.headers = hdrs;
 
             auto resp = std::make_shared<WebUtils::JsonResponse>(
                 WebUtils::Get<WebUtils::JsonResponse>(opts));
-            BSML::MainThreadScheduler::Schedule([resp, cb = std::move(cb)]() mutable {
+            BSML::MainThreadScheduler::Schedule([resp, url, cb = std::move(cb)]() mutable {
                 if (!resp->IsSuccessful() || !resp->responseData) {
+                    AMS_ERROR("API {} -> HTTP {}", url, resp->httpCode);
                     cb(nullptr, "HTTP " + std::to_string(resp->httpCode));
                     return;
                 }
@@ -216,7 +215,7 @@ static std::string urlEncode(const std::string& s) {
 void AppleMusicClient::search(const std::string& term, SongsCallback cb) {
     std::string sf = getStorefront();
     std::string url = BASE + "/v1/catalog/" + sf + "/search?term=" +
-                      urlEncode(term) + "&types=songs&limit=25";
+                      urlEncode(term) + "&types=songs&limit=25&l=en-US";
     apiGet(url, false, [cb](const rapidjson::Document* d, std::string err) {
         if (!d) { cb({}, err); return; }
         std::vector<AMSong> v;

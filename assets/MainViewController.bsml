@@ -23,10 +23,12 @@
         <vertical flex-height="100" horizontal-fit="Unconstrained" pad-top="1">
 
             <!-- Search input (Search section only) -->
-            <vertical active="false" id="searchContainer_" horizontal-fit="Unconstrained" pad-right="4" pad-bottom="2">
-                <string-setting text="Search Apple Music" value="searchTerm"
-                    on-change="onSearchQueryChanged" apply-on-change="false" preferred-width="46"/>
-            </vertical>
+            <horizontal active="false" id="searchContainer_" horizontal-fit="Unconstrained"
+                        pad-right="4" pad-bottom="2" spacing="1" child-expand-width="false">
+                <string-setting text="" value="searchTerm" on-change="onSearchQueryChanged"
+                    apply-on-change="true" preferred-width="40"/>
+                <button text="Go" on-click="onSearchQueryChanged" pref-width="10" pref-height="8" font-size="3"/>
+            </horizontal>
 
             <!-- Loading / error / status overlays -->
             <vertical ignore-layout="true" horizontal-fit="Unconstrained">
