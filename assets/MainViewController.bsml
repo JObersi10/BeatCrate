@@ -1,18 +1,32 @@
 <bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
     xsi:noNamespaceSchemaLocation='https://raw.githubusercontent.com/RedBrumbler/Quest-BSML-Docs/gh-pages/schema.xsd'>
 
-    <!-- [Left] Apple Music playlists / tracks -->
+    <!-- [Left] Apple Music library -->
     <vertical horizontal-fit="Unconstrained" anchor-max-x="0.260">
 
-        <!-- Header -->
+        <!-- Section tabs -->
+        <horizontal pivot-y="1" child-expand-width="false" pref-height="7" pad-right="4" spacing="1">
+            <button text="Playlists" on-click="onSectionPlaylists" pref-width="22" pref-height="7" font-size="2.8"/>
+            <button text="Songs"     on-click="onSectionSongs"     pref-width="16" pref-height="7" font-size="2.8"/>
+            <button text="Search"    on-click="onSectionSearch"    pref-width="16" pref-height="7" font-size="2.8"/>
+        </horizontal>
+
+        <!-- Sub-header: back + title + refresh -->
         <horizontal pivot-y="1" child-expand-width="false" pref-height="6" pad-right="4">
             <icon-button active="false" pad="0" id="backToPlaylistsButton_" icon="#HorizontalArrowIcon"
                 on-click="onBackToPlaylistsClicked" pref-width="8" pref-height="6" pivot-x="0" pad-right="1"/>
             <text id="leftColumnTitleTextView_" align="MidlineLeft" font-align="MidlineLeft"
-                word-wrapping="false" font-size="3.5" overflow-mode="Ellipsis"/>
+                word-wrapping="false" font-size="3.5" overflow-mode="Ellipsis" flex-width="1"/>
+            <button text="R" on-click="onRefreshClicked" pref-width="8" pref-height="6" font-size="3.5" hover-hint="Refresh"/>
         </horizontal>
 
         <vertical flex-height="100" horizontal-fit="Unconstrained" pad-top="1">
+
+            <!-- Search input (Search section only) -->
+            <vertical active="false" id="searchContainer_" horizontal-fit="Unconstrained" pad-right="4" pad-bottom="2">
+                <string-setting text="Search Apple Music" value="searchTerm"
+                    on-change="onSearchQueryChanged" apply-on-change="false" preferred-width="46"/>
+            </vertical>
 
             <!-- Loading / error / status overlays -->
             <vertical ignore-layout="true" horizontal-fit="Unconstrained">

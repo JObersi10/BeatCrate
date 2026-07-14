@@ -30,6 +30,7 @@ MOD_EXTERN_FUNC void setup(CModInfo* info) noexcept {
 MOD_EXTERN_FUNC void late_load() noexcept {
     il2cpp_functions::Init();
     BSML::Init();
+    getConfig().Load();
     custom_types::Register::AutoRegister();
     BSML::Register::RegisterMenuButton("BeatCrate", "Browse your Apple Music library", openBeatCrate);
     BSML::Register::RegisterSettingsMenu<ViewControllers::ServiceSelectViewController*>("BeatCrate", false);

@@ -15,6 +15,7 @@ void MainViewController::ctor() {
     INVOKE_BASE_CTOR(classof(HMUI::ViewController*));
     _selectedMapIndex = -1;
     _showingTracks    = false;
+    _section          = Section::Playlists;
 }
 
 void MainViewController::DidActivate(bool firstActivation, bool, bool) {
@@ -23,6 +24,7 @@ void MainViewController::DidActivate(bool firstActivation, bool, bool) {
 }
 
 void MainViewController::PostParse() {
+    // Hide all overlays/buttons that start inactive
     if (backToPlaylistsButton_) backToPlaylistsButton_->get_gameObject()->set_active(false);
     if (leftLoadingContainer_)  leftLoadingContainer_->get_gameObject()->set_active(false);
     if (leftErrorContainer_)    leftErrorContainer_->get_gameObject()->set_active(false);
@@ -31,6 +33,7 @@ void MainViewController::PostParse() {
     if (mapStatusContainer_)    mapStatusContainer_->get_gameObject()->set_active(false);
     if (mapListView_)           mapListView_->get_gameObject()->set_active(false);
     if (downloadButton_)        downloadButton_->get_gameObject()->set_active(false);
+    if (searchContainer_)       searchContainer_->get_gameObject()->set_active(false);
     if (downloadStatusTextView_) downloadStatusTextView_->set_text("");
     clearMapPreview();
 
@@ -54,12 +57,83 @@ void MainViewController::PostParse() {
         mapListView_->tableView->SetDataSource(
             reinterpret_cast<HMUI::TableView::IDataSource*>(_mapDS.ptr()), true);
 
+    if (leftColumnTitleTextView_) leftColumnTitleTextView_->set_text("Playlists");
     showLeftPlaylists();
-    if (leftColumnTitleTextView_) leftColumnTitleTextView_->set_text("Apple Music");
     loadPlaylists();
 }
 
-// ── Left panel ────────────────────────────────────────────────────────────────
+// ── Section switching ─────────────────────────────────────────────────────────
+
+void MainViewController::onSectionPlaylists() {
+    _section = Section::Playlists;
+    _showingTracks = false;
+    if (backToPlaylistsButton_) backToPlaylistsButton_->get_gameObject()->set_active(false);
+    if (searchContainer_)       searchContainer_->get_gameObject()->set_active(false);
+    if (leftColumnTitleTextView_) leftColumnTitleTextView_->set_text("Playlists");
+    if (playlistListView_) playlistListView_->get_gameObject()->set_active(true);
+    if (trackListView_)    trackListView_->get_gameObject()->set_active(false);
+    showLeftLoading();
+    loadPlaylists();
+}
+
+void MainViewController::onSectionSongs() {
+    _section = Section::Songs;
+    _showingTracks = false;
+    if (backToPlaylistsButton_) backToPlaylistsButton_->get_gameObject()->set_active(false);
+    if (searchContainer_)       searchContainer_->get_gameObject()->set_active(false);
+    if (leftColumnTitleTextView_) leftColumnTitleTextView_->set_text("Library Songs");
+    if (playlistListView_) playlistListView_->get_gameObject()->set_active(false);
+    if (trackListView_)    trackListView_->get_gameObject()->set_active(true);
+    showLeftLoading();
+    loadLibrarySongs();
+}
+
+void MainViewController::onSectionSearch() {
+    _section = Section::Search;
+    _showingTracks = false;
+    if (backToPlaylistsButton_) backToPlaylistsButton_->get_gameObject()->set_active(false);
+    if (searchContainer_)       searchContainer_->get_gameObject()->set_active(true);
+    if (leftColumnTitleTextView_) leftColumnTitleTextView_->set_text("Search");
+    if (playlistListView_) playlistListView_->get_gameObject()->set_active(false);
+    if (trackListView_)    trackListView_->get_gameObject()->set_active(false);
+    if (leftLoadingContainer_) leftLoadingContainer_->get_gameObject()->set_active(false);
+    if (leftErrorContainer_)   leftErrorContainer_->get_gameObject()->set_active(false);
+    if (leftStatusContainer_)  leftStatusContainer_->get_gameObject()->set_active(false);
+}
+
+void MainViewController::onRefreshClicked() {
+    switch (_section) {
+        case Section::Playlists:
+            showLeftLoading();
+            loadPlaylists();
+            break;
+        case Section::Songs:
+            showLeftLoading();
+            loadLibrarySongs();
+            break;
+        case Section::Search:
+            if (!_searchTerm.empty()) {
+                showLeftLoading();
+                if (trackListView_) trackListView_->get_gameObject()->set_active(false);
+                searchAppleMusic(_searchTerm);
+            }
+            break;
+    }
+}
+
+void MainViewController::onSearchQueryChanged() {
+    // Fired when user confirms text in the BSML keyboard
+    if (!_searchTerm.empty()) {
+        showLeftLoading();
+        if (trackListView_) trackListView_->get_gameObject()->set_active(false);
+        searchAppleMusic(_searchTerm);
+    }
+}
+
+StringW MainViewController::get_searchTerm() { return StringW(_searchTerm); }
+void    MainViewController::set_searchTerm(StringW v) { _searchTerm = static_cast<std::string>(v); }
+
+// ── Left panel helpers ────────────────────────────────────────────────────────
 
 void MainViewController::showLeftLoading() {
     if (leftLoadingContainer_) leftLoadingContainer_->get_gameObject()->set_active(true);
@@ -74,11 +148,13 @@ void MainViewController::showLeftPlaylists() {
     if (trackListView_)         trackListView_->get_gameObject()->set_active(false);
     if (leftErrorContainer_)    leftErrorContainer_->get_gameObject()->set_active(false);
     if (leftStatusContainer_)   leftStatusContainer_->get_gameObject()->set_active(false);
+    if (leftLoadingContainer_)  leftLoadingContainer_->get_gameObject()->set_active(false);
 }
 
 void MainViewController::showLeftTracks() {
     _showingTracks = true;
-    if (backToPlaylistsButton_) backToPlaylistsButton_->get_gameObject()->set_active(true);
+    if (backToPlaylistsButton_) backToPlaylistsButton_->get_gameObject()->set_active(
+        _section == Section::Playlists);
     if (trackListView_)         trackListView_->get_gameObject()->set_active(true);
     if (playlistListView_)      playlistListView_->get_gameObject()->set_active(false);
     if (leftErrorContainer_)    leftErrorContainer_->get_gameObject()->set_active(false);
@@ -100,7 +176,7 @@ void MainViewController::showLeftStatus(const std::string& msg) {
     if (leftStatusTextView_)    leftStatusTextView_->set_text(msg);
 }
 
-// ── Center panel ──────────────────────────────────────────────────────────────
+// ── Center panel helpers ──────────────────────────────────────────────────────
 
 void MainViewController::showMapLoading() {
     if (mapLoadingContainer_) mapLoadingContainer_->get_gameObject()->set_active(true);
@@ -121,7 +197,7 @@ void MainViewController::showMapStatus(const std::string& msg) {
     if (mapListView_)         mapListView_->get_gameObject()->set_active(false);
 }
 
-// ── Right panel ───────────────────────────────────────────────────────────────
+// ── Right panel helpers ───────────────────────────────────────────────────────
 
 void MainViewController::clearMapPreview() {
     if (previewMapNameTextView_)  previewMapNameTextView_->set_text("Select a map");
@@ -156,10 +232,20 @@ void MainViewController::showMapPreview(const AppleMusicSearch::BSMap& map) {
     if (downloadButton_)         downloadButton_->get_gameObject()->set_active(true);
 }
 
+// ── Track list reload helper ──────────────────────────────────────────────────
+
+void MainViewController::reloadTrackList(std::vector<AppleMusicSearch::AMSong> songs) {
+    _tracks = std::move(songs);
+    if (_trackDS) {
+        _trackDS->tracks_ = _tracks;
+        if (trackListView_ && trackListView_->tableView)
+            trackListView_->tableView->ReloadData();
+    }
+}
+
 // ── API calls ─────────────────────────────────────────────────────────────────
 
 void MainViewController::loadPlaylists() {
-    showLeftLoading();
     AppleMusicClient::instance().fetchLibraryPlaylists(
         [this](std::vector<AMPlaylist> playlists, std::string err) {
             if (leftLoadingContainer_) leftLoadingContainer_->get_gameObject()->set_active(false);
@@ -171,6 +257,29 @@ void MainViewController::loadPlaylists() {
                 if (playlistListView_ && playlistListView_->tableView)
                     playlistListView_->tableView->ReloadData();
             }
+            showLeftPlaylists();
+        });
+}
+
+void MainViewController::loadLibrarySongs() {
+    AppleMusicClient::instance().fetchLibrarySongs(
+        [this](std::vector<AMSong> songs, std::string err) {
+            if (leftLoadingContainer_) leftLoadingContainer_->get_gameObject()->set_active(false);
+            if (!err.empty()) { showLeftError(err); return; }
+            if (songs.empty()) { showLeftStatus("No songs in library.\nCheck MUT in Mod Settings."); return; }
+            reloadTrackList(std::move(songs));
+            showLeftTracks();
+        });
+}
+
+void MainViewController::searchAppleMusic(const std::string& query) {
+    AppleMusicClient::instance().search(query,
+        [this](std::vector<AMSong> songs, std::string err) {
+            if (leftLoadingContainer_) leftLoadingContainer_->get_gameObject()->set_active(false);
+            if (!err.empty()) { showLeftError(err); return; }
+            if (songs.empty()) { showLeftStatus("No songs found on Apple Music."); return; }
+            reloadTrackList(std::move(songs));
+            showLeftTracks();
         });
 }
 
@@ -182,12 +291,7 @@ void MainViewController::loadTracksForPlaylist(const std::string& playlistId, co
         [this](std::vector<AMSong> tracks, std::string err) {
             if (!err.empty()) { showLeftError(err); return; }
             if (tracks.empty()) { showLeftStatus("No tracks in this playlist."); return; }
-            _tracks = std::move(tracks);
-            if (_trackDS) {
-                _trackDS->tracks_ = _tracks;
-                if (trackListView_ && trackListView_->tableView)
-                    trackListView_->tableView->ReloadData();
-            }
+            reloadTrackList(std::move(tracks));
             showLeftTracks();
         });
 }
@@ -227,7 +331,7 @@ void MainViewController::onTrackSelected(UnityW<HMUI::TableView>, int index) {
 }
 
 void MainViewController::onBackToPlaylistsClicked() {
-    if (leftColumnTitleTextView_) leftColumnTitleTextView_->set_text("Apple Music");
+    if (leftColumnTitleTextView_) leftColumnTitleTextView_->set_text("Playlists");
     _tracks.clear();
     if (_trackDS) { _trackDS->tracks_.clear(); if (trackListView_ && trackListView_->tableView) trackListView_->tableView->ReloadData(); }
     showLeftPlaylists();
@@ -247,14 +351,14 @@ void MainViewController::onDownloadClicked() {
     if (_selectedMapIndex < 0 || _selectedMapIndex >= (int)_maps.size()) return;
     if (_isDownloading.load()) return;
     _isDownloading = true;
-    if (downloadButton_)        downloadButton_->get_gameObject()->set_active(false);
+    if (downloadButton_)         downloadButton_->get_gameObject()->set_active(false);
     if (downloadStatusTextView_) downloadStatusTextView_->set_text("Downloading...");
     auto map = _maps[_selectedMapIndex];
     BeatSaverClient::instance().downloadMap(
         map,
         [this](bool ok, std::string err) {
             _isDownloading = false;
-            if (downloadButton_)        downloadButton_->get_gameObject()->set_active(true);
+            if (downloadButton_)         downloadButton_->get_gameObject()->set_active(true);
             if (downloadStatusTextView_) downloadStatusTextView_->set_text(ok ? "Downloaded!" : "Failed: " + err);
         });
 }

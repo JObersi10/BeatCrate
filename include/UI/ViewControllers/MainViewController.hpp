@@ -25,30 +25,40 @@ DECLARE_CLASS_CODEGEN(AppleMusicSearch::UI::ViewControllers, MainViewController,
 
     DECLARE_INSTANCE_METHOD(void, PostParse);
 
-    // Left panel
-    DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::Button>,              backToPlaylistsButton_);
-    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>,               leftColumnTitleTextView_);
+    // ── Section switcher ─────────────────────────────────────────────────────
+    DECLARE_INSTANCE_METHOD(void, onSectionPlaylists);
+    DECLARE_INSTANCE_METHOD(void, onSectionSongs);
+    DECLARE_INSTANCE_METHOD(void, onSectionSearch);
+    DECLARE_INSTANCE_METHOD(void, onRefreshClicked);
+
+    // ── Left panel ───────────────────────────────────────────────────────────
+    DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::Button>,               backToPlaylistsButton_);
+    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>,                leftColumnTitleTextView_);
     DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::HorizontalLayoutGroup>, leftLoadingContainer_);
     DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::VerticalLayoutGroup>,   leftErrorContainer_);
-    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>,               leftErrorTextView_);
+    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>,                leftErrorTextView_);
     DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::VerticalLayoutGroup>,   leftStatusContainer_);
-    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>,               leftStatusTextView_);
-    DECLARE_INSTANCE_FIELD(UnityW<BSML::CustomListTableData>,            playlistListView_);
-    DECLARE_INSTANCE_FIELD(UnityW<BSML::CustomListTableData>,            trackListView_);
+    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>,                leftStatusTextView_);
+    DECLARE_INSTANCE_FIELD(UnityW<BSML::CustomListTableData>,             playlistListView_);
+    DECLARE_INSTANCE_FIELD(UnityW<BSML::CustomListTableData>,             trackListView_);
+
+    // Search section input container
+    DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::VerticalLayoutGroup>,  searchContainer_);
+    DECLARE_INSTANCE_METHOD(void, onSearchQueryChanged);
 
     DECLARE_INSTANCE_METHOD(void, onPlaylistSelected, UnityW<HMUI::TableView> table, int index);
     DECLARE_INSTANCE_METHOD(void, onTrackSelected,    UnityW<HMUI::TableView> table, int index);
     DECLARE_INSTANCE_METHOD(void, onBackToPlaylistsClicked);
 
-    // Center panel
+    // ── Center panel ─────────────────────────────────────────────────────────
     DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::HorizontalLayoutGroup>, mapLoadingContainer_);
     DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::VerticalLayoutGroup>,   mapStatusContainer_);
-    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>,               mapStatusTextView_);
-    DECLARE_INSTANCE_FIELD(UnityW<BSML::CustomListTableData>,            mapListView_);
+    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>,                mapStatusTextView_);
+    DECLARE_INSTANCE_FIELD(UnityW<BSML::CustomListTableData>,             mapListView_);
 
     DECLARE_INSTANCE_METHOD(void, onMapSelected, UnityW<HMUI::TableView> table, int index);
 
-    // Right panel
+    // ── Right panel ──────────────────────────────────────────────────────────
     DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, previewMapNameTextView_);
     DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, previewUploaderTextView_);
     DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, previewDurationTextView_);
@@ -58,7 +68,14 @@ DECLARE_CLASS_CODEGEN(AppleMusicSearch::UI::ViewControllers, MainViewController,
 
     DECLARE_INSTANCE_METHOD(void, onDownloadClicked);
 
+    // ── BSML property for search string-setting ───────────────────────────────
+public:
+    StringW get_searchTerm();
+    void    set_searchTerm(StringW v);
+
 private:
+    enum class Section { Playlists, Songs, Search };
+
     std::vector<AppleMusicSearch::AMPlaylist> _playlists;
     std::vector<AppleMusicSearch::AMSong>     _tracks;
     std::vector<AppleMusicSearch::BSMap>      _maps;
@@ -67,11 +84,15 @@ private:
     SafePtrUnity<AMTrackTableViewDataSource>    _trackDS;
     SafePtrUnity<BSMapTableViewDataSource>      _mapDS;
 
-    int  _selectedMapIndex = -1;
-    bool _showingTracks    = false;
+    Section _section          = Section::Playlists;
+    int     _selectedMapIndex = -1;
+    bool    _showingTracks    = false;
+    std::string _searchTerm;
     std::atomic<bool> _isDownloading{false};
 
     void loadPlaylists();
+    void loadLibrarySongs();
+    void searchAppleMusic(const std::string& query);
     void loadTracksForPlaylist(const std::string& playlistId, const std::string& playlistName);
     void searchBeatSaver(const std::string& title, const std::string& artist);
 
@@ -87,4 +108,6 @@ private:
 
     void clearMapPreview();
     void showMapPreview(const AppleMusicSearch::BSMap& map);
+
+    void reloadTrackList(std::vector<AppleMusicSearch::AMSong> songs);
 };
