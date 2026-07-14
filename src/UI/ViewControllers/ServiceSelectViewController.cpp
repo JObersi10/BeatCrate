@@ -17,6 +17,9 @@ void ServiceSelectViewController::DidActivate(bool firstActivation, bool, bool) 
     std::string mut = getMut();
     if (mutStatusText_)
         mutStatusText_->set_text(StringW(mut.empty() ? "Not set" : "Set (" + std::to_string(mut.size()) + " chars)"));
+    std::string jwt = getCachedJwt();
+    if (jwtStatusText_)
+        jwtStatusText_->set_text(StringW(jwt.empty() ? "Not set" : "Set (" + std::to_string(jwt.size()) + " chars)"));
 }
 
 void ServiceSelectViewController::onPasteMut() {
@@ -34,6 +37,17 @@ void ServiceSelectViewController::onMutChanged() {
         setMut(mut);
         if (mutStatusText_) mutStatusText_->set_text(StringW("Set (" + std::to_string(mut.size()) + " chars)"));
     }
+}
+
+void ServiceSelectViewController::onPasteJwt() {
+    auto clip = UnityEngine::GUIUtility::get_systemCopyBuffer();
+    std::string s = static_cast<std::string>(clip);
+    // Strip "Bearer " prefix if user copied the full header value
+    if (s.rfind("Bearer ", 0) == 0) s = s.substr(7);
+    if (jwtStatusText_) jwtStatusText_->set_text(StringW(s.empty() ? "Clipboard empty" : "Set (" + std::to_string(s.size()) + " chars)"));
+    if (s.empty()) return;
+    setCachedJwt(s);
+    AMS_LOG("JWT pasted ({} chars)", s.size());
 }
 
 StringW ServiceSelectViewController::get_mutToken()          { return StringW(getMut()); }

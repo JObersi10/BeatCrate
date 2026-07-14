@@ -27,6 +27,17 @@
 
       <text text='Get MUT: open music.apple.com, F12, Network tab, any request, copy Music-User-Token header'
             font-size='2.3' color='#777777' align='Left' word-wrapping='true'/>
+
+      <horizontal spacing='2' pad-top='2'>
+        <button text='Paste Bearer Token'
+                on-click='onPasteJwt'
+                preferred-width='50' preferred-height='9'
+                font-size='3.5'/>
+        <text id='jwtStatusText_' font-size='3' color='#AAAAAA' align='Left'/>
+      </horizontal>
+
+      <text text='Bearer Token: same Network tab, copy the Authorization header value (eyJ...)'
+            font-size='2.3' color='#777777' align='Left' word-wrapping='true'/>
     </vertical>
 
     <!-- Spotify section -->
